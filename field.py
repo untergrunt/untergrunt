@@ -10,7 +10,9 @@ class Cell: #Stores data about one cell
         if fill == None: fill = Cell.fill
         self.floor = floor
         self.fill = fill
-        self.symbol = ['+', '.'][randint(0,1)]
+        self.symbol = '.'
+        if self.floor == materials.Material.by_name('water'):
+            self.symbol = '~'
     
 class Camera: #Keeps track of the hero, tells what part of the field to show
     def __init__(self, w, h, field, actor):
@@ -28,7 +30,8 @@ class Camera: #Keeps track of the hero, tells what part of the field to show
     def get_screen(self): #returns a tuple of two 2d lists: charmap and colormap
         self.update()
         charmap = [[self.field[x][y].symbol for x in range(self.x, self.x + self.w)] for y in range(self.y, self.y + self.h)]
-        charmap[self.actor.y - self.y][self.actor.x - self.x] = '@'
+        charmap[self.actor.y - self.y][self.actor.x - self.x] = self.actor.get_symbol()
         colormap = [[self.field[x][y].floor.color for x in range(self.x, self.x + self.w)] for y in range(self.y, self.y + self.h)]
+        colormap[self.actor.y - self.y][self.actor.x - self.x] = 'green'
         return (charmap, colormap)
 

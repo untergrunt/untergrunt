@@ -1,9 +1,5 @@
-class Creature:
-    def __init__(self):
-        self.race = 'human'
-        self.sign = '@'
-        self.name = 'Urist'
-        self.x = 500
-        self.y = 500
+from creatures import *
         
-hero = Creature()
+hero = Creature(human_race, 'Urist')
+hero.locate(500,500)
+hero.symbol = '@'

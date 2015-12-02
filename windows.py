@@ -10,7 +10,6 @@ keys = graphics.keys
 
 def change_stage(new_stage):
     global current_stage
-#    if new_stage == 'main window': raise Exception()
     if current_stage in stage_unloaders:
         stage_unloaders[current_stage]()
     assert(new_stage in stage_loaders)
@@ -24,7 +23,7 @@ world_creation_window = graphics.Window(0, 0, graphics.width, graphics.height, t
 
 def create_main_window():
     main_window.wipe()
-    title_text = graphics.TextElement(graphics.width//2-7, 5,'THE ROGUELIKE!','b')
+    title_text = graphics.TextElement(graphics.width//2-7, 5,'THE ROGUELIKE!','br')
     buttons = [
     ('New game', lambda: change_stage('game')),
     ('Create new world', lambda: change_stage('new world')),
@@ -44,7 +43,9 @@ def load_main_window():
 
 def create_credit_window():
     credit_window.wipe()
-    t1, t2, t3 = graphics.TextElement(10,10,'Credit1'), graphics.TextElement(10,11,'Credit2'), graphics.TextElement(10,12,'Credit3')
+    t1 = graphics.TextElement(10, 10, 'Thanks to:', style='br')
+    t2 = graphics.TextElement(10, 13, 'The game is not nearly ready, so no credits for now', style='')
+    t3 = graphics.TextElement(10, 14, 'Not sure if I need them anyway...', style='')
     credit_window.add_element(t1)
     credit_window.add_element(t2)
     credit_window.add_element(t3)
@@ -81,18 +82,36 @@ def create_game_window():
     game_window.add_element(dfview)
     
 def load_game_window():
+    global karte, info, camera
     game_window.reset()
-    game_window.get_focus()
+    info = worldgen.map_to_strings(worldgen.load_map(charnum=1024))
+    karte = [[field.Cell(d[info[j][i]]) for i in range(1024)] for j in range(1024)]
+    camera = field.Camera(dfview.w, dfview.h, karte, hero)
+    inventory_window = graphics.Window(10, 10, 20, 20, title='Inventory', style='', back=lambda: game_window.get_focus())
+    dic = {
+        keys['i']: lambda: inventory_window.get_focus()
+    }
+    kae = graphics.KeyAcceptorElement(dic)
+    game_window.add_element(kae)
+    
+    game_window.show()
+    inventory_window.get_focus()
    
 #FIXME The block below must be replaced with actual code, of course
     
 charx, chary = 10,10   
 
 dfview = graphics.DfViewElement(0,0,graphics.width,graphics.height)
-    
-karte = [[field.Cell() for i in range(1000)] for j in range(1000)] 
+
+
+d = {
+'^': field.materials.Stone,
+'~': field.materials.Water,
+'+': field.materials.Sand,
+'&': field.materials.Stone,
+}
 hero = field.hero
-camera = field.Camera(dfview.w, dfview.h, karte, hero)
+
     
 def move_character_right():
     hero.x += 1
@@ -117,7 +136,12 @@ stage_loaders = {'main window': load_main_window,
                  'credits': load_credit_window, 
                  'new world': load_world_creation_window,
                  'game': load_game_window}
-stage_unloaders = {}
+stage_unloaders = {
+'main window': lambda: main_window.hide(),
+'credits': lambda: credit_window.hide(),
+'new world': lambda: world_creation_window.hide(),
+'game': lambda: game_window.hide()
+}
 
 create_world_creation_window()
 create_game_window()

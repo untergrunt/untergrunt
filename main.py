@@ -17,7 +17,7 @@ def event_manager(event):
         return False
     else:
         graphics.Window.get_event(event)
-        graphics.Window.focused_window.draw()
+        graphics.Window.draw_windows()
         graphics.win.refresh()
         print(event)
     

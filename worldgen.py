@@ -2,7 +2,7 @@ import random
 
 W=1024
 MAXH=W
-SCATTER=0.8
+SCATTER=20
 SL=96
 WL=40
 SQRT2=1.414

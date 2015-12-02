@@ -1,6 +1,6 @@
 import curses
 
-keys = {'down':258, 'up':259, 'left':260, 'right':261, 'enter': 10, 'esc': 263} #27 - esc
+keys = {'down':258, 'up':259, 'left':260, 'right':261, 'enter': 10, 'esc': 263, 'i':105} #27 - esc
 
 #Delay of the main menu may be caused by the ESC key delay, using backspace instead for now
 
@@ -63,12 +63,22 @@ def interact(interpreter):
         
 class Window:
     focused_window = None
+    __register = []
+    def draw_windows():
+        for window in Window.__register:
+            if window != Window.focused_window and window.visible:
+                window.draw()
+        if Window.focused_window != None and Window.focused_window.visible:
+            Window.focused_window.draw()
     def get_event(event):
         if Window.focused_window != None:
             Window.focused_window.accept_event(event)
     def accept_event(self, event):
         if self.back != None and event == keys['esc']:
             self.back()
+        for element in self.ems:
+            if isinstance(element, KeyAcceptorElement) and element.can_accept_event(event):
+                element.accept_event(event)
         if self.focused_element != None:
             if self.focused_element.can_accept_event(event):
                 self.focused_element.accept_event(event)
@@ -90,6 +100,12 @@ class Window:
         self.focused_element = None
         self.bold = 'b' in style
         self.noborder = 'n' in style
+        self.visible = False
+        Window.__register.append(self)
+    def show(self):
+        self.visible = True
+    def hide(self):
+        self.visible = False
     def wipe(self):
         self.has_focus = False
         self.ems = []
@@ -108,6 +124,7 @@ class Window:
         if self.focus_acceptors != []:
             self.focus_acceptors[0].get_focus()
             self.focused_element = self.focus_acceptors[0]
+        self.show()
     def lose_focus(self):
         if self.has_focus:
             self.has_focus = False
@@ -127,9 +144,9 @@ class Window:
                     win.addch(y,x,'=')
             for x in range(len(self.title)):
                 if self.bold:
-                    win.addch(self.y,(self.w - len(self.title))//2 + x,self.title[x], curses.A_BOLD)
+                    win.addch(self.y,self.x + (self.w - len(self.title))//2 + x,self.title[x], curses.A_BOLD)
                 else:
-                    win.addch(self.y,(self.w - len(self.title))//2 + x,self.title[x])
+                    win.addch(self.y,self.x + (self.w - len(self.title))//2 + x,self.title[x])
         for e in self.ems:
             e.draw()
     def add_element(self, element):
@@ -163,10 +180,10 @@ class TextElement(WindowElement):
     def draw(self):
         if not isinstance(self.parent, Window): raise ValueError('Cannot draw a TextElement without a parent')
         for i in range(len(self.text)):
-            if self.bold:
-                win.addch(self.parent.y + self.y, self.parent.x + self.x + i, self.text[i], curses.A_BOLD+ color_pairs['attention'])
-            else:
-                win.addch(self.parent.y + self.y, self.parent.x + self.x + i, self.text[i])
+            mod = 0
+            if self.bold: mod += curses.A_BOLD
+            if self.red: mod += color_pairs['attention']
+            win.addch(self.parent.y + self.y, self.parent.x + self.x + i, self.text[i], mod)
                 
 class VerticalMenuElement(WindowElement):
     def can_accept_event(self, event):
@@ -253,6 +270,18 @@ class DfViewElement(WindowElement):
         for x in range(self.w):
             for y in range(self.h):
                 win.addch(self.parent.y + self.y + y, self.parent.x + self.x + x, self.text_map[y][x], color_pairs[self.color_map[y][x]])
+                
+class KeyAcceptorElement(WindowElement):
+    def __init__(self, dic):
+        assert(type(dic) == dict)
+        assert(all(type(x) == int for x in dic.keys()))
+        self.dic = dic
+    def can_accept_event(self, event):
+        return event in self.dic
+    def draw(self):
+        pass
+    def accept_event(self, event):
+        self.dic[event]()
    
 init_graphics()
                

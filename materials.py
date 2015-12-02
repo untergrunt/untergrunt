@@ -22,3 +22,5 @@ class Material:
         
 Stone = Material('stone', 'white')
 Air = Material('air', None)
+Water = Material('water', 'blue')
+Sand = Material('sand', 'yellow')
