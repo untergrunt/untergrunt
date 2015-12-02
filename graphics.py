@@ -1,6 +1,8 @@
 import curses
 
-keys = {'down':258, 'up':259, 'left':260, 'right':261, 'enter': 10, 'esc': 27}
+keys = {'down':258, 'up':259, 'left':260, 'right':261, 'enter': 10, 'esc': 263} #27 - esc
+
+#Delay of the main menu may be caused by the ESC key delay, using backspace instead for now
 
 def print(*args):
     log = open('log.txt', 'a')
@@ -93,6 +95,11 @@ class Window:
         self.ems = []
         self.focus_acceptors = []
         self.focused_element = None
+    def reset(self):
+        self.has_focus = False
+        self.focused_element = None
+        for element in self.ems:
+            element.reset()
     def get_focus(self):
         if Window.focused_window != None:
             Window.focused_window.has_focus = False
@@ -144,6 +151,8 @@ class WindowElement:
         raise NotImplementedError('Drawing not implemented for', type(self))
     def get_focus(self):
         self.has_focus = True
+    def reset(self):
+        print('Warning: reset method not implemented for', type(self))
         
 class TextElement(WindowElement):
     def __init__(self, x, y, text, style=''): #x, y relative to the window, starting from 1 for windows with borders
@@ -182,7 +191,10 @@ class VerticalMenuElement(WindowElement):
         assert(all('\n' not in i for i in bindings))
         self.can_accept_focus = True
         self.focused_element = None
-        has_focus = False
+        self.has_focus = False
+    def reset(self):
+        self.focused_element = None
+        self.has_focus = False
     def get_focus(self):
         if self.focused_element == None:
             self.focused_element = 0
