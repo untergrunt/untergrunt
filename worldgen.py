@@ -2,7 +2,7 @@ import random
 
 W=1024
 MAXH=W
-SCATTER=0.8
+SCATTER=20
 SL=96
 WL=40
 SQRT2=1.414
@@ -114,12 +114,30 @@ def load_map(fname='map',charnum=32):
       for x in range(scale):
         for y in range(scale):
           s+=hmap[i*scale+x][j*scale+y]
+
       s=s//(scale**2)
       s=s*100//w
       cmap[i][j]=s
   return cmap[:-1]
 
+def map_to_strings(map):
+    def what(n):
+        if n>200: return '^'
+        if n>100: return '&'
+        if n>50: return '+'
+        else: return '~'
+    return [[what(j) for j in i] for i in map]
+    
+def map_to_colors(map):
+    def what(n):
+        if n>200: return 'white'
+        if n>100: return 'brown'
+        if n>50: return 'green'
+        else: return 'blue'
+    return [[what(j) for j in i] for i in map]
+
 '''generate(512)
 export()
 map=load_map(charnum=16)'''
+
 
