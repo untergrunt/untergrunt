@@ -33,6 +33,7 @@ def init_graphics():
     curses.init_pair(5, curses.COLOR_YELLOW, curses.COLOR_BLACK)
     curses.init_pair(6, curses.COLOR_MAGENTA, curses.COLOR_BLACK)
     curses.init_pair(7, curses.COLOR_BLUE, curses.COLOR_BLACK)
+    curses.init_pair(8, curses.COLOR_BLACK, curses.COLOR_BLUE)
 
     color_pairs = {'normal': curses.color_pair(1), 
                    'highlight': curses.color_pair(2),
@@ -42,7 +43,8 @@ def init_graphics():
                    'yellow': curses.color_pair(5),
                    'white': curses.color_pair(1),
                    'brown': curses.color_pair(6),
-                   'blue': curses.color_pair(7)}
+                   'blue': curses.color_pair(7),
+                   'black': curses.color_pair(8)}
 
 def die():
     curses.nocbreak()
@@ -266,7 +268,7 @@ class DfViewElement(WindowElement):
             self.color_map = color_map
     def draw(self):
         if self.text_map == None: return
-        print(self.text_map)
+        #print(self.text_map)
         for x in range(self.w):
             for y in range(self.h):
                 win.addch(self.parent.y + self.y + y, self.parent.x + self.x + x, self.text_map[y][x], color_pairs[self.color_map[y][x]])
