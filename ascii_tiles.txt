@@ -1,0 +1,6 @@
+water ~
+floor .
+tree $
+unexplored #
+grass ,
+bush &
