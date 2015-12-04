@@ -1,6 +1,11 @@
 import graphics
 import worldgen
 import field
+from materials import Material, Water, Sand, Air, Stone, Void, Dirt
+from tiles import *
+import camera
+
+by_name = Material.by_name
 
 print = graphics.print
 
@@ -82,49 +87,60 @@ def create_game_window():
     game_window.add_element(dfview)
     
 def load_game_window():
-    global karte, info, camera
+    global karte, info, big_brother
     game_window.reset()
-    info = worldgen.map_to_strings(worldgen.load_map(charnum=1024))
-    karte = [[field.Cell(d[info[j][i]]) for i in range(1024)] for j in range(1024)]
-    camera = field.Camera(dfview.w, dfview.h, karte, hero)
-    inventory_window = graphics.Window(10, 10, 20, 20, title='Inventory', style='', back=lambda: game_window.get_focus())
-    dic = {
-        keys['i']: lambda: inventory_window.get_focus()
-    }
+    #info = worldgen.map_to_strings(worldgen.load_map(charnum=1024))
+    #karte = [[field.Cell(by_name(info[j][i])) for i in range(1024)] for j in range(1024)]
+    #In karte will be materials
+    def generate_local_map_of_materials(map_of_things):
+        m=map_of_things
+        dic = {
+            'water': Water,
+            'stone': Stone,
+            'air': Air,
+            'void': Void,
+            'sand': Sand,
+            'tree': Stone,
+            'floor': Dirt
+        }
+        return [[field.Cell(dic[map_of_things[j][i]]) for i in range(1024)] for j in range(1024)]
+#    karte = generate_local_map_of_materials(info)
+    karte = camera.BigMap('plane',5,5)
+    karte.generate()
+    big_brother = camera.Camera(dfview.w, dfview.h, karte, hero)
+    #inventory_window = graphics.Window(10, 10, 20, 20, title='Inventory', style='', back=lambda: game_window.get_focus())
+    dic = {}
+    #keys['i']: lambda: inventory_window.get_focus()
     kae = graphics.KeyAcceptorElement(dic)
     game_window.add_element(kae)
-    
-    game_window.show()
-    inventory_window.get_focus()
+    game_window.get_focus()
+    #inventory_window.get_focus()
+    dfview.text_map, dfview.color_map = big_brother.get_screen()
    
 #FIXME The block below must be replaced with actual code, of course
+#HA-HA, replaced
     
 charx, chary = 10,10   
 
 dfview = graphics.DfViewElement(0,0,graphics.width,graphics.height)
 
 
-d = {
-'^': field.materials.Stone,
-'~': field.materials.Water,
-'+': field.materials.Sand,
-'&': field.materials.Stone,
-}
+
 hero = field.hero
 
     
 def move_character_right():
     hero.x += 1
-    dfview.text_map, dfview.color_map = camera.get_screen()
+    dfview.text_map, dfview.color_map = big_brother.get_screen()
 def move_character_left():
     hero.x -= 1
-    dfview.text_map, dfview.color_map = camera.get_screen()
+    dfview.text_map, dfview.color_map = big_brother.get_screen()
 def move_character_up():
     hero.y -= 1
-    dfview.text_map, dfview.color_map = camera.get_screen()
+    dfview.text_map, dfview.color_map = big_brother.get_screen()
 def move_character_down():
     hero.y += 1
-    dfview.text_map, dfview.color_map = camera.get_screen()
+    dfview.text_map, dfview.color_map = big_brother.get_screen()
     
     
     

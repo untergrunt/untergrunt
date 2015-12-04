@@ -122,10 +122,10 @@ def load_map(fname='map',charnum=32):
 
 def map_to_strings(map):
     def what(n):
-        if n>200: return '^'
-        if n>100: return '&'
-        if n>50: return '+'
-        else: return '~'
+        if n>200: return 'sand'
+        if n>100: return 'tree'
+        if n>50: return 'floor'
+        else: return 'water'
     return [[what(j) for j in i] for i in map]
     
 def map_to_colors(map):

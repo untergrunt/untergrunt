@@ -18,9 +18,13 @@ class Material:
             return Material.__register[name]
         else:
             raise ValueError('No material with name', name)
+    def has_material(name):
+        return name in Material.__register
         
         
 Stone = Material('stone', 'white')
-Air = Material('air', None)
+Air = Material('air', 'red')
 Water = Material('water', 'blue')
 Sand = Material('sand', 'yellow')
+Void = Material('void', 'black')
+Dirt = Material('dirt', 'brown')
