@@ -80,7 +80,7 @@ class Window:
             self.back()
         for element in self.ems:
             if isinstance(element, KeyAcceptorElement) and element.can_accept_event(event):
-                element.accept_event(event)
+                element.accept_event(event) #All KeyAcceptors allways get treir events
         if self.focused_element != None:
             if self.focused_element.can_accept_event(event):
                 self.focused_element.accept_event(event)

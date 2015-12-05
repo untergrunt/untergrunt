@@ -113,7 +113,10 @@ def load_game_window():
     karte.add_creature(hero, 500, 500)
     '''End map init '''
     big_brother = camera.Camera(dfview.w, dfview.h, karte, hero)
-    inventory_window = graphics.Window(0,0, graphics.width, graphics.height, title='Inventory', style='', back=lambda: game_window.get_focus())
+    def return_back():
+        inventory_window.hide()
+        game_window.get_focus()
+    inventory_window = graphics.Window(0,0, graphics.width, graphics.height, title='Inventory', style='', back=return_back)
     dic = {keys['i']: lambda: inventory_window.get_focus(),
            keys['enter']: lambda: MSG.pop('Hello!', game_window)}
     
