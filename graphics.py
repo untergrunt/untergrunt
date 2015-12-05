@@ -1,6 +1,6 @@
 import curses
 
-keys = {'down':258, 'up':259, 'left':260, 'right':261, 'enter': 10, 'esc': 263, 'i':105} #27 - esc
+keys = {'down':258, 'up':259, 'left':260, 'right':261, 'enter': 10, 'esc': 263, 'i':105} #27 - esc, 263 - backspace
 
 #Delay of the main menu may be caused by the ESC key delay, using backspace instead for now
 

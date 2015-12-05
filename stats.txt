@@ -1,0 +1,8 @@
+#Of course, these boring mainstream stats will be replaced with a more interesting system one day
+charisma:CHR:Nothing here
+strength:STR:Nothing here
+inelligence:INT:Nothing here
+luck:LCK:Nothing here
+willpower:WPR:Nothing here
+dexterity:DXT:Nothing here
+focus:FCS:Nothing here

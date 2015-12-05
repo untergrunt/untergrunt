@@ -1,5 +1,6 @@
 from field import *
-from graphics import print
+#from graphics import print
+from os import mkdir, listdir
 
 class Chunk: #NEVER generates map information, only stores. Chunks are always square
     def __init__(self, size):
@@ -17,7 +18,7 @@ class Chunk: #NEVER generates map information, only stores. Chunks are always sq
 class BigMap:
     '''
         The class keeps __all__ the data about current 'level'; that includes:
-            -- Every cell's floor and fill materials
+            -- Every cell's floor and fill materials (done)
             -- Every creature on the map
             -- Every static object (decorations, e.g. stones and trees)
             -- Everything on the floor (e.g. dropped weapons and small stones)
@@ -34,6 +35,8 @@ class BigMap:
         self.w = w
         self.h = h
         self.sz = sz
+        self.__ready = False
+        self.__creatures = {}
     def generate(self):
         solution = {
             'dungeon': BigMap.generate_dungeon,
@@ -42,6 +45,9 @@ class BigMap:
             'plane': BigMap.generate_plane
         }
         self.chunks = solution[self.alg](self.w, self.h, self.sz)
+        self.__ready = True
+    def ready(self):
+        return self.__ready
     def generate_dungeon(w, h, sz): #TODO
         pass
     def generate_village(w, h, sz): #TODO
@@ -76,6 +82,42 @@ class BigMap:
                 x,
                 y
                 ]
+    def save(self, fname='world'):
+        files = listdir('save')
+        assert(self.ready())
+        def save_to_dir(dirname):
+            mkdir(dirname)
+            for y in range(len(self.chunks)):
+                for x in range(len(self.chunks[y])):
+                    O = open('{}/chunk_{}_{}.save'.format(dirname, x, y), 'w')
+                    O.write('\n'.join(' '.join([str(j) for j in i]) for i in self.chunks[y][x].mas))
+                    O.close()
+        if fname not in files:
+            save_to_dir('save/'+fname)
+        else:
+            n=1
+            while fname + str(n) in files:
+                n += 1
+            save_to_dir('save/'+fname+str(n))
+    def add_creature(self, creature, x, y):
+        if creature.id not in self.__creatures:
+            self.__creatures[creature.id] = (x, y)
+    def where_is(self, creature):
+        try:
+            return self.__creatures[creature.id]
+        except:
+            raise ValueError('Could not find such a creature')
+    def known(self, creature):
+        return creature.id in self.__creatures
+    def move_creature(self, creature, x, y):
+        try:
+            x0, y0 = self.__creatures[creature.id]
+            self.__creatures[creature.id] = (x0 + x, y0 + y)
+        except:
+            raise ValueError('Could not find such a creature')
+            
+            
+            
     
     
     

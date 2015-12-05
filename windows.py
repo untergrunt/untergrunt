@@ -31,7 +31,7 @@ def create_main_window():
     title_text = graphics.TextElement(graphics.width//2-7, 5,'THE ROGUELIKE!','br')
     buttons = [
     ('New game', lambda: change_stage('game')),
-    ('Create new world', lambda: change_stage('new world')),
+    ('Create new world', lambda: print('Disabled')),
     ('Load game', lambda: print('New game loaded')),
     ('Show credits', lambda: change_stage('credits')),
     ('Quit', graphics.die)
@@ -105,12 +105,15 @@ def load_game_window():
         }
         return [[field.Cell(dic[map_of_things[j][i]]) for i in range(1024)] for j in range(1024)]
 #    karte = generate_local_map_of_materials(info)
+    '''Map initialization'''
     karte = camera.BigMap('plane',5,5)
     karte.generate()
+    karte.add_creature(hero, 500, 500)
+    '''End map init '''
     big_brother = camera.Camera(dfview.w, dfview.h, karte, hero)
-    #inventory_window = graphics.Window(10, 10, 20, 20, title='Inventory', style='', back=lambda: game_window.get_focus())
-    dic = {}
-    #keys['i']: lambda: inventory_window.get_focus()
+    inventory_window = graphics.Window(0,0, graphics.width, graphics.height, title='Inventory', style='', back=lambda: game_window.get_focus())
+    dic = {keys['i']: lambda: inventory_window.get_focus()}
+    
     kae = graphics.KeyAcceptorElement(dic)
     game_window.add_element(kae)
     game_window.get_focus()
@@ -125,21 +128,22 @@ charx, chary = 10,10
 dfview = graphics.DfViewElement(0,0,graphics.width,graphics.height)
 
 
-
 hero = field.hero
 
+def move_hero(x, y):
+    big_brother.field.move_creature(hero, x, y)
     
 def move_character_right():
-    hero.x += 1
+    move_hero(1, 0)
     dfview.text_map, dfview.color_map = big_brother.get_screen()
 def move_character_left():
-    hero.x -= 1
+    move_hero(-1, 0)
     dfview.text_map, dfview.color_map = big_brother.get_screen()
 def move_character_up():
-    hero.y -= 1
+    move_hero(0, -1)
     dfview.text_map, dfview.color_map = big_brother.get_screen()
 def move_character_down():
-    hero.y += 1
+    move_hero(0, 1)
     dfview.text_map, dfview.color_map = big_brother.get_screen()
     
     
