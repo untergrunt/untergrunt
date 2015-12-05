@@ -13,6 +13,8 @@ current_stage = 'main window'
 
 keys = graphics.keys
 
+MSG = graphics.MessageBox
+
 def change_stage(new_stage):
     global current_stage
     if current_stage in stage_unloaders:
@@ -112,7 +114,8 @@ def load_game_window():
     '''End map init '''
     big_brother = camera.Camera(dfview.w, dfview.h, karte, hero)
     inventory_window = graphics.Window(0,0, graphics.width, graphics.height, title='Inventory', style='', back=lambda: game_window.get_focus())
-    dic = {keys['i']: lambda: inventory_window.get_focus()}
+    dic = {keys['i']: lambda: inventory_window.get_focus(),
+           keys['enter']: lambda: MSG.pop('Hello!', game_window)}
     
     kae = graphics.KeyAcceptorElement(dic)
     game_window.add_element(kae)

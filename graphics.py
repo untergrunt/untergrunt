@@ -159,6 +159,37 @@ class Window:
         if element.can_accept_focus:
             self.focus_acceptors.append(element)
         
+              
+class MessageBox(Window):
+    def __init__(self, text, back):
+        l = len(text)
+        maxlen = 80
+        if l < 40:
+            w = l + 10
+            h = 5
+        else:
+            w = maxlen + 10
+            n = l // maxlen
+            h = n + 5
+        self.w = max(w, 40)
+        self.h = h
+        kae = KeyAcceptorElement({keys['enter']: back})
+        self.x = 10
+        self.y = 10
+        self.ems = [kae]
+        self.focus_acceptors = [kae]
+        self.focused_element = kae
+        self.bold = False
+        self.noborder = False
+        self.visible = False
+        self.title = 'MESSAGE'
+        self.has_focus = False
+        self.back = back
+        kae.parent = self
+    def pop(msg, prev_window):
+        A = MessageBox(msg, lambda: prev_window.get_focus())
+        A.get_focus()
+        
 class WindowElement:
     parent = None
     can_accept_focus = False
