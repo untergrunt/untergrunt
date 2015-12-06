@@ -167,7 +167,7 @@ class Window:
         
               
 class MessageBox(Window):
-    def __init__(self, text, back):
+    def __init__(self, text, back=None):
         l = len(text)
         maxlen = 80
         if l < maxlen:
@@ -190,7 +190,8 @@ class MessageBox(Window):
         self.visible = False
         self.title = 'Attention!(Press <enter> to discard)'
         self.has_focus = False
-        self.back = back
+        if back != None:
+            self.back = back
         self.red = True
         kae.parent = self
         if l < maxlen:
@@ -198,7 +199,9 @@ class MessageBox(Window):
         else:
             txt = TextElement(5,2,maxlen,text)
         self.add_element(txt)
-    def pop(msg, prev_window):
+    def pop(msg, prev_window=None):
+        if prev_window == None:
+            prev_window = MessageBox.back
         A = MessageBox(msg, lambda: prev_window.get_focus())
         A.get_focus()
         

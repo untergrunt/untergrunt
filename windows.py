@@ -4,6 +4,7 @@ import field
 from materials import Material, Water, Sand, Air, Stone, Void, Dirt
 from tiles import *
 import camera
+from mechanics import player_acts
 
 by_name = Material.by_name
 
@@ -81,10 +82,12 @@ def create_game_window():
     dfview.set_text_map('.')
     dfview.set_color_map('normal')
     dfview.accepts_keys = [keys['down'], keys['up'], keys['left'], keys['right']]
-    dfview.actions = {keys['down']: move_character_down,
-                      keys['up']: move_character_up,
-                      keys['left']: move_character_left,
-                      keys['right']: move_character_right}
+    dfview.actions = {
+        keys['down']: lambda:player_really_acts('down'),
+        keys['up']: lambda:player_really_acts('up'),
+        keys['left']: lambda:player_really_acts('left'),
+        keys['right']: lambda:player_really_acts('right')
+    }
     dfview.can_accept_focus = True
     game_window.add_element(dfview)
     
@@ -108,9 +111,10 @@ def load_game_window():
         return [[field.Cell(dic[map_of_things[j][i]]) for i in range(1024)] for j in range(1024)]
 #    karte = generate_local_map_of_materials(info)
     '''Map initialization'''
-    karte = camera.BigMap('dungeon',1000,1000)
+    karte = camera.BigMap('dungeon',10000,10000)
     karte.generate()
-    karte.add_creature(hero, 500, 500)
+    karte.add_creature(hero, 5000, 5000)
+    karte.hero = hero
     '''End map init '''
     big_brother = camera.Camera(dfview.w, dfview.h, karte, hero)
     def return_back():
@@ -131,6 +135,8 @@ def load_game_window():
    
 #FIXME The block below must be replaced with actual code, of course
 #HA-HA, replaced
+  
+MSG.back = game_window
     
 charx, chary = 10,10   
 
@@ -161,6 +167,10 @@ def move_character_down():
     
     
     
+def player_really_acts(event):
+    player_acts(event, karte)
+    dfview.text_map, dfview.color_map = big_brother.get_screen()
+    locator.text = str(big_brother.field.where_is(hero))
     
     
     
