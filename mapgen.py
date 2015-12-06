@@ -86,6 +86,8 @@ class BigMap:
                 return False
         except:
             raise ValueError('Could not find such a creature')
+    def get_creatures(self):
+        return self.__creatures
             
             
             

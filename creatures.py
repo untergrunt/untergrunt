@@ -1,3 +1,5 @@
+from ai import goblin_AI
+
 
 class Stats:
     possible = []
@@ -16,39 +18,51 @@ class Stats:
 Stats.init_class()
 
 class Race:
-    def __init__(self, racename, symbol):
+    def __init__(self, racename, symbol, ai_class):
         assert(type(racename) == str)
         assert(type(symbol) == str)
         assert(len(symbol) == 1)
         self.name = racename
         self.symbol = symbol
+        self.ai_class = ai_class
     def set_stats(self, stats):
         assert(type(stats) == Stats)
         self.stats = stats
 
-human_race = Race('human', 'h')
-goblin_race = Race('goblin', 'g')
-dwarven_race = Race('dwarf', 'd')
+human_race = Race('human', 'h', goblin_AI)
+goblin_race = Race('goblin', 'g', goblin_AI)
+dwarven_race = Race('dwarf', 'd', goblin_AI)
 
 class Creature:
     symbol = None
     __max_id = 0
-    def __init__(self, race, name, stats=None):
+    __reg = []
+    def __init__(self, race, name, stats=None, ai=None):
         if stats == None:
             stats = race.stats
+        if ai == None:
+            self.AI = race.ai_class(self)
+        elif isinstance(ai, type):
+            self.AI = ai(self)
+        else:
+            self.AI = ai
         assert(isinstance(race, Race))
         assert(type(name) == str)
         self.race = race
         self.name = name
         Creature.__max_id += 1
         self.id = Creature.__max_id
+        Creature.__reg.append(self)
     def get_symbol(self):
         return self.symbol if self.symbol != None else self.race.symbol
     def can_pass_through(self, cell):
         if cell.floor.name not in ['sand', 'stone', 'dirt']: return False
         if cell.fill.name not in ['air', 'void']: return False
         return True
-        
+    def by_id(ID):
+        for i in Creature.__reg:
+            if i.id == ID:
+                return i
         
         
         

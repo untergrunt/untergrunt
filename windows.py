@@ -114,6 +114,8 @@ def load_game_window():
     karte = camera.BigMap('dungeon',10000,10000)
     karte.generate()
     karte.add_creature(hero, 5000, 5000)
+    from hero import gob
+    karte.add_creature(gob, 5005, 5004)
     karte.hero = hero
     '''End map init '''
     big_brother = camera.Camera(dfview.w, dfview.h, karte, hero)
@@ -121,7 +123,7 @@ def load_game_window():
         inventory_window.hide()
         game_window.get_focus()
     inventory_window = graphics.Window(0,0, graphics.width, graphics.height, title='Inventory', style='', back=return_back)
-    short_text = 'You have just pressed <enter>. Now humanity will pay for that!'
+    short_text = 'The forgotten beast Afjbskfb has arrived! It has four wings and its eyes glow red. Beware its poisonous gas!'
     dic = {keys['i']: lambda: inventory_window.get_focus(),
            keys['enter']: lambda: MSG.pop(short_text, game_window)}
     kae = graphics.KeyAcceptorElement(dic)
