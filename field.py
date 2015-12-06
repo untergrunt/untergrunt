@@ -22,5 +22,12 @@ class Cell: #Stores data about one cell
                 raise ValueError('Expected a material, got', type(fill))
         self.floor = floor
         self.fill = fill
+    def __str__(self):
+        if self.fill.name not in ['air', 'void']:
+            return '#'
+        elif self.floor.name == 'water':
+            return '~'
+        else:
+            return '.'
     
 

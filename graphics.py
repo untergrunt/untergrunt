@@ -2,6 +2,8 @@ import curses
 
 keys = {'down':258, 'up':259, 'left':260, 'right':261, 'enter': 10, 'esc': 263, 'i':105} #27 - esc, 263 - backspace
 
+table_symbols = {'-': '─', '|': '│', 'ul': '┌', 'll': '└', 'ur': '┐', 'lr': '┘'}
+
 #Delay of the main menu may be caused by the ESC key delay, using backspace instead for now
 
 def print(*args):
@@ -102,6 +104,7 @@ class Window:
         self.focused_element = None
         self.bold = 'b' in style
         self.noborder = 'n' in style
+        self.red = 'r' in style
         self.visible = False
         Window.__register.append(self)
     def show(self):
@@ -138,17 +141,20 @@ class Window:
             for y in range(self.y, self.y+self.h):
                 win.addch(y,x,' ')
         if not self.noborder:
+            stl = color_pairs['red'] if self.red else 0
             for x in [self.x, self.x + self.w - 1]:
                 for y in range(self.y, self.y+self.h):
-                    win.addch(y,x,'|')
+                    win.addch(y,x,table_symbols['|'], stl)
             for x in range(self.x+1, self.x+self.w-1):
                 for y in [self.y, self.y + self.h - 1]:
-                    win.addch(y,x,'=')
+                    win.addch(y,x,table_symbols['-'], stl)
+            win.addch(self.y, self.x, table_symbols['ul'], stl)
+            win.addch(self.y + self.h - 1, self.x, table_symbols['ll'], stl)
+            win.addch(self.y, self.x + self.w - 1, table_symbols['ur'], stl)
+            win.addch(self.y + self.h - 1, self.x + self.w - 1, table_symbols['lr'], stl)
+            stl = curses.A_BOLD if self.bold else 0
             for x in range(len(self.title)):
-                if self.bold:
-                    win.addch(self.y,self.x + (self.w - len(self.title))//2 + x,self.title[x], curses.A_BOLD)
-                else:
-                    win.addch(self.y,self.x + (self.w - len(self.title))//2 + x,self.title[x])
+                    win.addch(self.y,self.x + (self.w - len(self.title))//2 + x,self.title[x], stl)
         for e in self.ems:
             e.draw()
     def add_element(self, element):
@@ -164,7 +170,7 @@ class MessageBox(Window):
     def __init__(self, text, back):
         l = len(text)
         maxlen = 80
-        if l < 40:
+        if l < maxlen:
             w = l + 10
             h = 5
         else:
@@ -174,18 +180,24 @@ class MessageBox(Window):
         self.w = max(w, 40)
         self.h = h
         kae = KeyAcceptorElement({keys['enter']: back})
-        self.x = 10
-        self.y = 10
+        self.x = (width - self.w) // 2
+        self.y = (height - self.h) // 2
         self.ems = [kae]
         self.focus_acceptors = [kae]
         self.focused_element = kae
         self.bold = False
         self.noborder = False
         self.visible = False
-        self.title = 'MESSAGE'
+        self.title = 'Attention!(Press <enter> to discard)'
         self.has_focus = False
         self.back = back
+        self.red = True
         kae.parent = self
+        if l < maxlen:
+            txt = LabelElement(5,2,text)
+        else:
+            txt = TextElement(5,2,maxlen,text)
+        self.add_element(txt)
     def pop(msg, prev_window):
         A = MessageBox(msg, lambda: prev_window.get_focus())
         A.get_focus()
@@ -204,19 +216,42 @@ class WindowElement:
     def reset(self):
         print('Warning: reset method not implemented for', type(self))
         
-class TextElement(WindowElement):
+class LabelElement(WindowElement):
     def __init__(self, x, y, text, style=''): #x, y relative to the window, starting from 1 for windows with borders
         self.bold = 'b' in style #Just an example, more are coming TODO
         self.red = 'r' in style
         self.x, self.y = x, y
         self.text = text
     def draw(self):
-        if not isinstance(self.parent, Window): raise ValueError('Cannot draw a TextElement without a parent')
+        if not isinstance(self.parent, Window): raise ValueError('Cannot draw a LabelElement without a parent')
         for i in range(len(self.text)):
             mod = 0
             if self.bold: mod += curses.A_BOLD
             if self.red: mod += color_pairs['attention']
             win.addch(self.parent.y + self.y, self.parent.x + self.x + i, self.text[i], mod)
+            
+class TextElement(WindowElement):
+    def __init__(self, x, y, w, text, style=''): #x, y relative to the window, should start from 1 for windows with borders
+        self.bold = 'b' in style #Just an example, more are coming TODO
+        self.red = 'r' in style
+        self.x, self.y = x, y
+        self.text = text
+        self.w = w
+    def draw(self):
+        if not isinstance(self.parent, Window): raise ValueError('Cannot draw a TextElement without a parent')
+        mod = 0
+        if self.bold: mod += curses.A_BOLD
+        if self.red: mod += color_pairs['attention']
+        l = len(self.text)
+        w = self.w
+        h = l // w
+        #Draw the natural part of the text
+        for y in range(h):
+            for x in range(w):
+                win.addch(self.parent.y + self.y + y, self.parent.x + self.x + x, self.text[y*w+x], mod)
+        #Draw the rest
+        for i in range(l - w * h):
+            win.addch(self.parent.y + self.y + h, self.parent.x + self.x + i, self.text[w*h + i], mod)
                 
 class VerticalMenuElement(WindowElement):
     def can_accept_event(self, event):

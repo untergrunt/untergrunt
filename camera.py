@@ -29,17 +29,28 @@ class Camera: #Keeps track of the hero, tells what part of the field to show
     def get_screen(self): #returns a tuple of two 2d lists: charmap and colormap
         self.update()
         def symbol_on_cell(cell):
-#            if cell.floor.name in ascii:
+            '''
+            if cell.fill.name in ['air', 'void']: #Draw what is on the floor
                 if cell.floor.name == 'water':
-                    return ascii['water']
+                    return '~'
                 else:
                     return '.'
- #           else:
-  #              return '?'
+            else:
+                if cell.fill.name == 'stone':
+                    return '#'
+                else:
+                    return '!'
+           '''
+            return str(cell)
+        def color_on_cell(cell):
+            if cell.fill.name in ['air', 'void']:
+                return cell.floor.color
+            else:
+                return cell.fill.color
         charmap = [[symbol_on_cell(self.m[x-self.ch_x*self.ch_sz][y-self.ch_y*self.ch_sz]) for x in range(self.x, self.x + self.w)] for y in range(self.y, self.y + self.h)]
         x, y = self.field.where_is(self.actor)
         charmap[y - self.y][x - self.x] = self.actor.get_symbol()
-        colormap = [[self.m[x-self.ch_x*self.ch_sz][y-self.ch_y*self.ch_sz].floor.color for x in range(self.x, self.x + self.w)] for y in range(self.y, self.y + self.h)]
+        colormap = [[color_on_cell(self.m[x-self.ch_x*self.ch_sz][y-self.ch_y*self.ch_sz]) for x in range(self.x, self.x + self.w)] for y in range(self.y, self.y + self.h)]
         colormap[y - self.y][x - self.x] = 'green'
         return (charmap, colormap)
 

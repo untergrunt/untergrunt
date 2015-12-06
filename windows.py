@@ -30,7 +30,7 @@ world_creation_window = graphics.Window(0, 0, graphics.width, graphics.height, t
 
 def create_main_window():
     main_window.wipe()
-    title_text = graphics.TextElement(graphics.width//2-7, 5,'THE ROGUELIKE!','br')
+    title_text = graphics.LabelElement(graphics.width//2-7, 5,'THE ROGUELIKE!','br')
     buttons = [
     ('New game', lambda: change_stage('game')),
     ('Create new world', lambda: print('Disabled')),
@@ -50,9 +50,9 @@ def load_main_window():
 
 def create_credit_window():
     credit_window.wipe()
-    t1 = graphics.TextElement(10, 10, 'Thanks to:', style='br')
-    t2 = graphics.TextElement(10, 13, 'The game is not nearly ready, so no credits for now', style='')
-    t3 = graphics.TextElement(10, 14, 'Not sure if I need them anyway...', style='')
+    t1 = graphics.LabelElement(10, 10, 'Thanks to:', style='br')
+    t2 = graphics.LabelElement(10, 13, 'The game is not nearly ready, so no credits for now', style='')
+    t3 = graphics.LabelElement(10, 14, 'Not sure if I need them anyway...', style='')
     credit_window.add_element(t1)
     credit_window.add_element(t2)
     credit_window.add_element(t3)
@@ -108,7 +108,7 @@ def load_game_window():
         return [[field.Cell(dic[map_of_things[j][i]]) for i in range(1024)] for j in range(1024)]
 #    karte = generate_local_map_of_materials(info)
     '''Map initialization'''
-    karte = camera.BigMap('plane',5,5)
+    karte = camera.BigMap('dungeon',5,5)
     karte.generate()
     karte.add_creature(hero, 500, 500)
     '''End map init '''
@@ -117,10 +117,13 @@ def load_game_window():
         inventory_window.hide()
         game_window.get_focus()
     inventory_window = graphics.Window(0,0, graphics.width, graphics.height, title='Inventory', style='', back=return_back)
+    short_text = 'You have just pressed <enter>. Now humanity will pay for that!'
     dic = {keys['i']: lambda: inventory_window.get_focus(),
-           keys['enter']: lambda: MSG.pop('Hello!', game_window)}
-    
+           keys['enter']: lambda: MSG.pop(short_text, game_window)}
     kae = graphics.KeyAcceptorElement(dic)
+    global locator
+    locator = graphics.LabelElement(1,1,'(500, 500)')
+    game_window.add_element(locator)
     game_window.add_element(kae)
     game_window.get_focus()
     #inventory_window.get_focus()
@@ -142,15 +145,19 @@ def move_hero(x, y):
 def move_character_right():
     move_hero(1, 0)
     dfview.text_map, dfview.color_map = big_brother.get_screen()
+    locator.text = str(big_brother.field.where_is(hero))
 def move_character_left():
     move_hero(-1, 0)
     dfview.text_map, dfview.color_map = big_brother.get_screen()
+    locator.text = str(big_brother.field.where_is(hero))
 def move_character_up():
     move_hero(0, -1)
     dfview.text_map, dfview.color_map = big_brother.get_screen()
+    locator.text = str(big_brother.field.where_is(hero))
 def move_character_down():
     move_hero(0, 1)
     dfview.text_map, dfview.color_map = big_brother.get_screen()
+    locator.text = str(big_brother.field.where_is(hero))
     
     
     

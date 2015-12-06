@@ -14,6 +14,8 @@ class Chunk: #NEVER generates map information, only stores. Chunks are always sq
         assert(all(all(j.size == size for j in i) for i in chunks))
         layers = sum([[sum([chunks[n][i].mas[j] for i in range(3)], []) for j in range(size)] for n in range(3)], [])
         return layers
+    def __str__(self):
+        return '\n'.join(' '.join(str(j) for j in i) for i in self.mas)
 
 class BigMap:
     '''
@@ -38,18 +40,28 @@ class BigMap:
         self.__ready = False
         self.__creatures = {}
     def generate(self):
-        solution = {
+        generators = {
             'dungeon': BigMap.generate_dungeon,
             'village': BigMap.generate_village,
             'lenoblast': BigMap.generate_lenoblast,
             'plane': BigMap.generate_plane
         }
-        self.chunks = solution[self.alg](self.w, self.h, self.sz)
+        self.chunks = generators[self.alg](self.w, self.h, self.sz)
         self.__ready = True
     def ready(self):
         return self.__ready
     def generate_dungeon(w, h, sz): #TODO
-        pass
+#        m = [[Chunk(sz) for i in range(w)] for j in range(h)]
+        bm = [[False] * (w*sz) for i in range(h*sz)]
+        for y in range(100,550):
+            for x in range(100,550):
+                bm[y][x] = True
+        m = [[Chunk(sz) for x in range(w)] for y in range(h)]
+        for y in range(h):
+            for x in range(w):
+                data = [[Cell('stone', ('air' if bm[y*sz + yy][x*sz + xx] else 'stone')) for xx in range(sz)] for yy in range(sz)]
+                m[y][x].set_data(data)
+        return m
     def generate_village(w, h, sz): #TODO
         pass
     def generate_lenoblast(w, h, sz): #TODO
@@ -74,9 +86,9 @@ class BigMap:
         return x_int not in range(x_chunk_curr*self.sz, (x_chunk_curr + 1)*self.sz)\
             or y_int not in range(y_chunk_curr*self.sz, (y_chunk_curr + 1)*self.sz)
     def get_update(self, x_int, y_int):
-        assert(x_int // self.sz + 2 < self.w)
-        assert(y_int // self.sz + 2 < self.h)
         x, y = x_int // self.sz, y_int // self.sz
+        assert(x + 2 < self.w)
+        assert(y + 2 < self.h)
         return [
                 Chunk.nine_chunks_to_map([i[x-1:x+3] for i in self.chunks[y-1:y+3]]),
                 x,
@@ -90,7 +102,7 @@ class BigMap:
             for y in range(len(self.chunks)):
                 for x in range(len(self.chunks[y])):
                     O = open('{}/chunk_{}_{}.save'.format(dirname, x, y), 'w')
-                    O.write('\n'.join(' '.join([str(j) for j in i]) for i in self.chunks[y][x].mas))
+                    O.write(str(self.chunks[x][y]))
                     O.close()
         if fname not in files:
             save_to_dir('save/'+fname)
