@@ -44,6 +44,10 @@ class Creature:
         self.id = Creature.__max_id
     def get_symbol(self):
         return self.symbol if self.symbol != None else self.race.symbol
+    def can_pass_through(self, cell):
+        if cell.floor.name not in ['sand', 'stone', 'dirt']: return False
+        if cell.fill.name not in ['air', 'void']: return False
+        return True
         
         
         
