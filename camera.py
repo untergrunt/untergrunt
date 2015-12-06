@@ -45,13 +45,14 @@ class Camera: #Keeps track of the hero, tells what part of the field to show
                 return cell.fill.color
         charmap = [[symbol_on_cell(self.field.m[y][x]) for x in range(self.x, self.x + self.w)] for y in range(self.y, self.y + self.h)]
         x, y = self.field.where_is(self.actor)
-#        charmap[y - self.y][x - self.x] = self.actor.get_symbol()
         for c in self.field.get_creatures():
             z = Creature.by_id(c)
             if z:
                 zx, zy = self.field.where_is(z)
                 if ((zy - self.y) in range(height)) and ((zx - self.x) in range(width)):
                     charmap[zy - self.y][zx - self.x] = z.get_symbol()
+        x, y = self.field.where_is(self.actor)
+        charmap[y - self.y][x - self.x] = self.actor.get_symbol()
         colormap = [[color_on_cell(self.field.m[y][x]) for x in range(self.x, self.x + self.w)] for y in range(self.y, self.y + self.h)]
         colormap[y - self.y][x - self.x] = 'green'
         return (charmap, colormap)

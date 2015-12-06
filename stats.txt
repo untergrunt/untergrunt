@@ -6,3 +6,4 @@ luck:LCK:Nothing here
 willpower:WPR:Nothing here
 dexterity:DXT:Nothing here
 focus:FCS:Nothing here
+speed:SPD:Speed

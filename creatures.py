@@ -12,7 +12,9 @@ class Stats:
         I.close()
     def __init__(self, dic):
         assert(set([i[1] for i in Stats.possible]) == set(dic.keys()))
-        self.dic = dic
+        self.dic = dic.copy()
+    def copy(self):
+        return Stats(self.dic)
         
 
 Stats.init_class()
@@ -53,6 +55,7 @@ class Creature:
         Creature.__max_id += 1
         self.id = Creature.__max_id
         Creature.__reg.append(self)
+        self.stats = stats
     def get_symbol(self):
         return self.symbol if self.symbol != None else self.race.symbol
     def can_pass_through(self, cell):
@@ -63,7 +66,11 @@ class Creature:
         for i in Creature.__reg:
             if i.id == ID:
                 return i
-        
+    def get_stat(self, stat):
+        if stat in self.stats.dic:
+            return self.stats.dic[stat]
+        else:
+            raise ValueError('No such stat -', stat)
         
         
         
@@ -79,11 +86,12 @@ human_stats = Stats({
     'LCK': 10,
     'FCS': 10,
     'WPR': 10,
-    'DXT': 10
+    'DXT': 10,
+    'SPD': 10
 })
-human_race.set_stats(human_stats)   
-goblin_race.set_stats(human_stats) 
-dwarven_race.set_stats(human_stats) 
+human_race.set_stats(human_stats.copy())   
+goblin_race.set_stats(human_stats.copy()) 
+dwarven_race.set_stats(human_stats.copy()) 
         
         
         
