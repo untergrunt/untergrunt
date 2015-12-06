@@ -15,12 +15,7 @@ class Camera: #Keeps track of the hero, tells what part of the field to show
         x, y = field.where_is(self.actor)
         self.x = x - self.w // 2 #starting position
         self.y = y - self.h // 2 #maybe plus, curse the curses
-        self.m, self.ch_x, self.ch_y = field.get_update(self.x, self.y)
-        self.ch_sz = field.sz
     def update(self):
-        if self.field.update_needed(self.x, self.y, self.ch_x, self.ch_y):
-            self.m, self.ch_x, self.ch_y = self.field.get_update(self.x, self.y)
-            print('Got update')
         x, y = self.field.where_is(self.actor)
         if self.x + self.w // 2 - x not in range(-60, 60):
             self.x = x - self.w // 2
@@ -47,10 +42,10 @@ class Camera: #Keeps track of the hero, tells what part of the field to show
                 return cell.floor.color
             else:
                 return cell.fill.color
-        charmap = [[symbol_on_cell(self.m[x-self.ch_x*self.ch_sz][y-self.ch_y*self.ch_sz]) for x in range(self.x, self.x + self.w)] for y in range(self.y, self.y + self.h)]
+        charmap = [[symbol_on_cell(self.field.m[y][x]) for x in range(self.x, self.x + self.w)] for y in range(self.y, self.y + self.h)]
         x, y = self.field.where_is(self.actor)
-        charmap[y - self.y][x - self.x] = self.actor.get_symbol()
-        colormap = [[color_on_cell(self.m[x-self.ch_x*self.ch_sz][y-self.ch_y*self.ch_sz]) for x in range(self.x, self.x + self.w)] for y in range(self.y, self.y + self.h)]
+        charmap[y - self.y][x - self.x] = self.actor.get_symbol() #FIXME
+        colormap = [[color_on_cell(self.field.m[y][x]) for x in range(self.x, self.x + self.w)] for y in range(self.y, self.y + self.h)]
         colormap[y - self.y][x - self.x] = 'green'
         return (charmap, colormap)
 

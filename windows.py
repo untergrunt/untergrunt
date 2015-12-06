@@ -108,7 +108,7 @@ def load_game_window():
         return [[field.Cell(dic[map_of_things[j][i]]) for i in range(1024)] for j in range(1024)]
 #    karte = generate_local_map_of_materials(info)
     '''Map initialization'''
-    karte = camera.BigMap('dungeon',5,5)
+    karte = camera.BigMap('dungeon',1000,1000)
     karte.generate()
     karte.add_creature(hero, 500, 500)
     '''End map init '''
