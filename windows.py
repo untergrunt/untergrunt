@@ -5,8 +5,7 @@ from materials import Material, Water, Sand, Air, Stone, Void, Dirt
 from tiles import *
 import camera
 from mechanics import player_acts
-
-by_name = Material.by_name
+from creatures import Creature
 
 print = graphics.print
 
@@ -91,7 +90,8 @@ def create_game_window():
         'The forgotten beast Afjbskfb has arrived! It has four wings and its eyes glow red. Beware its poisonous gas!'
     dic = {
             keys['i']: lambda: inventory_window.get_focus(),
-            keys['k']: lambda: game_window.pass_internal_focus(cursor)
+            keys['k']: lambda: cursor.get_focus(),
+            keys['enter']: lambda: MSG.pop(short_text)
           }
     kae = graphics.KeyAcceptorElement(dic)
     
@@ -104,20 +104,26 @@ def create_game_window():
     locator = graphics.LabelElement(1,1,'(500, 500)')
     karte.add_creature(hero, 1500, 1500)
     big_brother = camera.Camera(dfview.w, dfview.h, karte, hero)
-    def handler(x, y):
-        pass
-    cursor = graphics.CursorElement(0, 0, 20, 20, handler)
+    def handler(self, x, y):
+        cre = karte.get_creatures()
+        g_x, g_y = big_brother.to_global((x, y))
+        s = ['floor: {}\nfill: {}\ncoords: ({}, {})'.format(karte.m[g_x][g_y].floor.name, karte.m[g_x][g_y].fill.name, g_x, g_y)]
+        for k in cre:
+            if big_brother.to_local(cre[k]) == (x, y):
+                s += ['Here you see a {}'.format(Creature.by_id(k).race.name)]
+        s = '\n'.join(s)
+        MSG.pop(s)
+        
+    cursor = graphics.CursorElement(0, 0, width-1, height-1, handler)
     
     def setup_dfview():
-        
-        dfview.set_text_map('.')
-        dfview.set_color_map('normal')
-        dfview.accepts_keys = [keys['down'], keys['up'], keys['left'], keys['right']]
+        dfview.accepts_keys = [keys['down'], keys['up'], keys['left'], keys['right'], keys['.']]
         dfview.actions = {
             keys['down']: lambda:let_the_player_act_and_pass_the_changes_to_the_dfview('down'),
             keys['up']: lambda:let_the_player_act_and_pass_the_changes_to_the_dfview('up'),
             keys['left']: lambda:let_the_player_act_and_pass_the_changes_to_the_dfview('left'),
-            keys['right']: lambda:let_the_player_act_and_pass_the_changes_to_the_dfview('right')
+            keys['right']: lambda:let_the_player_act_and_pass_the_changes_to_the_dfview('right'),
+            keys['.']: lambda:let_the_player_act_and_pass_the_changes_to_the_dfview('wait')
         }
         dfview.can_accept_focus = True
         
@@ -139,6 +145,7 @@ def load_game_window():
     '''End map initializasion '''
     game_window.reset()
     game_window.get_focus()
+#    big_brother.actor = gob #For fun
     dfview.text_map, dfview.color_map = big_brother.get_screen()
     
     

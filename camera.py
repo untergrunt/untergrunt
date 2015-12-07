@@ -56,4 +56,10 @@ class Camera: #Keeps track of the hero, tells what part of the field to show
         colormap = [[color_on_cell(self.field.m[y][x]) for x in range(self.x, self.x + self.w)] for y in range(self.y, self.y + self.h)]
         colormap[y - self.y][x - self.x] = 'green'
         return (charmap, colormap)
+    def to_local(self, coords):
+        x, y = coords
+        return (x - self.x, y - self.y)
+    def to_global(self, coords):
+        x, y = coords
+        return (x + self.x, y + self.y)
 

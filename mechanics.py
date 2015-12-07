@@ -75,14 +75,16 @@ def player_acts(command, field):
         
 def operate(command, field):
     if command == 'down':
-        if not field.move_creature(field.hero, 0, 1):
+        if not field.move_creature(hero, 0, 1):
             MSG.pop('You can\'t walk into walls!')
     elif command == 'up':
-        if not field.move_creature(field.hero, 0, -1):
+        if not field.move_creature(hero, 0, -1):
             MSG.pop('You can\'t walk into walls!')
     elif command == 'left':
-        if not field.move_creature(field.hero, -1, 0):
+        if not field.move_creature(hero, -1, 0):
             MSG.pop('You can\'t walk into walls!')
     elif command == 'right':
-        if not field.move_creature(field.hero, 1, 0):
+        if not field.move_creature(hero, 1, 0):
             MSG.pop('You can\'t walk into walls!')
+    elif  command == 'wait':
+        pass

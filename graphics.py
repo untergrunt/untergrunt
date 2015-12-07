@@ -1,6 +1,6 @@
 import curses
 
-keys = {'down':258, 'up':259, 'left':260, 'right':261, 'enter': 10, 'esc': 263, 'i':105, 'k': 11} #27 - esc, 263 - backspace
+keys = {'down':258, 'up':259, 'left':260, 'right':261, 'enter': 10, 'esc': 263, 'i':105, 'k': 11, '.': 46} #27 - esc, 263 - backspace
 for i in range(97, 123):
     keys[chr(i)] = i
 
@@ -71,6 +71,27 @@ class Window:
     focused_window = None
     __register = []
     name = None
+    element_focus_stack = []
+    def key_acceptor_function(self, event): 
+        '''
+            This function decides what to do with any event sent to its elements
+            When unable to handle an event, returns False, otherwise True
+            Must be overriden for specific behaviour like that:
+                def foo(self, event):
+                    Do something
+                    return True of False
+                my_window.key_acceptor_function = foo
+        '''
+        accepted_flag = False
+        for element in self.ems:
+            if isinstance(element, KeyAcceptorElement) and element.can_accept_event(event):
+                element.accept_event(event) #All KeyAcceptors allways get treir events
+                accepted_flag = True
+        if self.focused_element != None:
+            if self.focused_element.can_accept_event(event):
+                self.focused_element.accept_event(event)
+                accepted_flag  = True
+        return accepted_flag
     def draw_windows():
         print('new')
         for window in Window.__register:
@@ -84,14 +105,9 @@ class Window:
         if Window.focused_window != None:
             Window.focused_window.accept_event(event)
     def accept_event(self, event):
-        if self.back != None and event == keys['esc']:
-            self.back()
-        for element in self.ems:
-            if isinstance(element, KeyAcceptorElement) and element.can_accept_event(event):
-                element.accept_event(event) #All KeyAcceptors allways get treir events
-        if self.focused_element != None:
-            if self.focused_element.can_accept_event(event):
-                self.focused_element.accept_event(event)
+        if not self.key_acceptor_function(event):
+            if self.back != None and event == keys['esc']:
+                self.back()
     def __init__(self, x, y, w, h, title = '', back=None, style=''):
         self.has_focus = False
         self.back = back
@@ -112,6 +128,7 @@ class Window:
         self.noborder = 'n' in style
         self.red = 'r' in style
         self.visible = False
+        self.element_focus_stack = []
         Window.__register.append(self)
     def show(self):
         self.visible = True
@@ -132,9 +149,10 @@ class Window:
             Window.focused_window.has_focus = False
         Window.focused_window = self
         self.has_focus = True
-        if self.focus_acceptors != []:
-            self.focus_acceptors[0].get_focus()
-            self.focused_element = self.focus_acceptors[0]
+        if self.focused_element == None:
+            if self.focus_acceptors != []:
+                self.focus_acceptors[0].get_focus()
+                self.focused_element = self.focus_acceptors[0]
         self.show()
     def lose_focus(self):
         if self.has_focus:
@@ -144,7 +162,8 @@ class Window:
             self.focused_element = None
     def pass_internal_focus(self, e):
         assert(e in self.ems)
-        e.get_focus()
+        self.element_focus_stack.append(self.focused_element) #May be VERY buggy later
+        e.has_focus = True
         self.focused_element = e
     def draw(self):
         for x in range(self.x, self.x+self.w):
@@ -166,7 +185,8 @@ class Window:
             for x in range(len(self.title)):
                     win.addch(self.y,self.x + (self.w - len(self.title))//2 + x,self.title[x], stl)
         for e in self.ems:
-            e.draw()
+            if  e.visible:
+                e.draw()
     def add_element(self, element):
         assert(isinstance(element, WindowElement))
         assert(element.parent == None)
@@ -206,9 +226,10 @@ class MessageBox(Window):
             self.back = back
         self.red = True
         kae.parent = self
-        if l < maxlen:
+        if l < maxlen and '\n' not in text:
             txt = LabelElement(5,2,text)
         else:
+            self.h += text.count('\n')
             txt = TextElement(5,2,maxlen,text)
         self.add_element(txt)
     def pop(msg, prev_window=None):
@@ -220,6 +241,11 @@ class MessageBox(Window):
 class WindowElement:
     parent = None
     can_accept_focus = False
+    visible = True
+    def show(self):
+        self.visible = True
+    def hide(self):
+        self.visible = False
     def can_accept_events(self, event):
         return False
     def __init__(self, *args):
@@ -228,6 +254,7 @@ class WindowElement:
         raise NotImplementedError('Drawing not implemented for', type(self))
     def get_focus(self):
         self.has_focus = True
+        self.parent.pass_internal_focus(self)
     def reset(self):
         print('Warning: reset method not implemented for', type(self))
         
@@ -257,16 +284,19 @@ class TextElement(WindowElement):
         mod = 0
         if self.bold: mod += curses.A_BOLD
         if self.red: mod += color_pairs['attention']
-        l = len(self.text)
-        w = self.w
-        h = l // w
-        #Draw the natural part of the text
-        for y in range(h):
-            for x in range(w):
-                win.addch(self.parent.y + self.y + y, self.parent.x + self.x + x, self.text[y*w+x], mod)
-        #Draw the rest
-        for i in range(l - w * h):
-            win.addch(self.parent.y + self.y + h, self.parent.x + self.x + i, self.text[w*h + i], mod)
+        parts = self.text.split('\n')
+        for z in range(len(parts)):
+            part = parts[z]
+            l = len(part)
+            w = self.w
+            h = l // w
+            #Draw the natural part of the text
+            for y in range(h):
+               for x in range(w):
+                   win.addch(self.parent.y + self.y + y + z, self.parent.x + self.x + x, part[y*w+x], mod)
+            #Draw the rest
+            for i in range(l - w * h):
+               win.addch(self.parent.y + self.y + h + z, self.parent.x + self.x + i, part[w*h + i], mod)
                 
 class VerticalMenuElement(WindowElement):
     def can_accept_event(self, event):
@@ -299,6 +329,7 @@ class VerticalMenuElement(WindowElement):
         if self.focused_element == None:
             self.focused_element = 0
         self.has_focus = True
+        self.parent.pass_internal_focus(self)
     def scroll_focus_down(self):
         assert(self.focused_element == None or self.focused_element in range(len(self.bindings)))
         if self.focused_element in [None, len(self.bindings) - 1]:
@@ -372,11 +403,12 @@ class CursorElement(WindowElement):
         self.min_x, self.min_y, self.max_x, self.max_y = min_x, min_y, max_x, max_y
         self.x = (min_x + max_x) // 2
         self.y = (min_y + max_y) // 2
-        self.enter_handler = enter_handler
+        self.handler = enter_handler
+        self.visible = False
     def can_accept_event(self, event):
         return event in [keys['down'], keys['up'], keys['left'], keys['right'], keys['enter'], keys['esc']]
     def draw(self):
-        win.addch(self.parent.y + self. y, self.parent.x + self.x, 'X', color_pairs['yellow'])
+        win.addch(self.parent.y + self. y, self.parent.x + self.x, 'X', color_pairs['red'])
     def accept_event(self, event):
         if event == keys['down']:
             if self.y < self.max_y:
@@ -390,8 +422,18 @@ class CursorElement(WindowElement):
         elif event == keys['left']:
             if self.x > self.min_x:
                 self.x -= 1   
+        elif event == keys['esc']:
+            self.has_focus = False
+            self.parent.focused_element = self.parent.element_focus_stack.pop()
+            self.hide()
         else:
-            self.enter_handler(self.x, self.y)
+            self.handler(self, self.x, self.y)
+    def handler(self, x, y):
+        pass
+    def get_focus(self):
+        self.has_focus = True
+        self.parent.pass_internal_focus(self)
+        self.visible = True
             
             
             

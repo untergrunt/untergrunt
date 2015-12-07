@@ -34,7 +34,7 @@ class BigMap:
     def ready(self):
         return self.__ready
     def generate_dungeon(w, h):
-        bm = [[Cell('stone','stone')] * w for i in range(h)]
+        bm = [[Cell('water','stone')] * w for i in range(h)]
         for y in range(1450,1550):
             for x in range(1450,1550):
                 bm[y][x] = Cell('stone','air')
