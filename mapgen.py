@@ -86,6 +86,15 @@ class BigMap:
                 return False
         except:
             raise ValueError('Could not find such a creature')
+    def can_move_creature(self, creature, x, y):
+        try:
+            x0, y0 = self.__creatures[creature.id]
+            if creature.can_pass_through(self.m[y0 + y][x0 + x]):
+                return True
+            else:
+                return False
+        except:
+            raise ValueError('Could not find such a creature')
     def get_creatures(self):
         return self.__creatures
             
