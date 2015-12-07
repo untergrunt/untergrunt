@@ -35,8 +35,8 @@ class BigMap:
         return self.__ready
     def generate_dungeon(w, h):
         bm = [[Cell('stone','stone')] * w for i in range(h)]
-        for y in range(4950,5050):
-            for x in range(4950,5050):
+        for y in range(1450,1550):
+            for x in range(1450,1550):
                 bm[y][x] = Cell('stone','air')
         return bm
     def generate_village(w, h): #TODO
@@ -73,7 +73,7 @@ class BigMap:
         try:
             return self.__creatures[creature.id]
         except:
-            raise ValueError('Could not find such a creature')
+            raise ValueError('Could not find such a creature -', creature.id)
     def knows(self, creature):
         return creature.id in self.__creatures
     def move_creature(self, creature, x, y):

@@ -6,9 +6,9 @@ table_symbols = {'-': '─', '|': '│', 'ul': '┌', 'll': '└', 'ur': '┐', 
 
 #Delay of the main menu may be caused by the ESC key delay, using backspace instead for now
 
-def print(*args):
+def print(*args, end='\n'):
     log = open('log.txt', 'a')
-    log.write(' '.join(str(i) for i in args) + '\n')
+    log.write(' '.join(str(i) for i in args) + end)
     log.close()
     
 def reset_log():
@@ -68,7 +68,11 @@ def interact(interpreter):
 class Window:
     focused_window = None
     __register = []
+    name = None
     def draw_windows():
+        print('new')
+        for window in Window.__register:
+            print(window.visible, window.name)
         for window in Window.__register:
             if window != Window.focused_window and window.visible:
                 window.draw()
@@ -164,6 +168,8 @@ class Window:
         self.ems.append(element)
         if element.can_accept_focus:
             self.focus_acceptors.append(element)
+    def get_reg():
+        return Window.__register
         
               
 class MessageBox(Window):

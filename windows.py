@@ -78,6 +78,21 @@ def load_world_creation_window():
     
 def create_game_window():
     game_window.wipe()
+    global karte, big_brother
+    short_text = 'The forgotten beast Afjbskfb has arrived! It has four wings and its eyes glow red. Beware its poisonous gas!'
+    def return_back():
+        inventory_window.hide()
+        game_window.get_focus()
+    inventory_window = graphics.Window(0,0, graphics.width, graphics.height, title='Inventory', style='', back=return_back)
+    dic = {keys['i']: lambda: inventory_window.get_focus(),
+           keys['enter']: lambda: MSG.pop(short_text, game_window)}
+    kae = graphics.KeyAcceptorElement(dic)
+    karte = camera.BigMap('dungeon',3000,3000)
+    karte.add_creature(hero, 1500, 1500)
+    big_brother = camera.Camera(dfview.w, dfview.h, karte, hero)
+    game_window.add_element(kae)
+    global locator
+    locator = graphics.LabelElement(1,1,'(500, 500)')
     global dfview
     dfview.set_text_map('.')
     dfview.set_color_map('normal')
@@ -90,14 +105,12 @@ def create_game_window():
     }
     dfview.can_accept_focus = True
     game_window.add_element(dfview)
+    game_window.add_element(locator)
     
 def load_game_window():
     global karte, info, big_brother
     game_window.reset()
-    #info = worldgen.map_to_strings(worldgen.load_map(charnum=1024))
-    #karte = [[field.Cell(by_name(info[j][i])) for i in range(1024)] for j in range(1024)]
-    #In karte will be materials
-    def generate_local_map_of_materials(map_of_things):
+    '''def generate_local_map_of_materials(map_of_things):
         m=map_of_things
         dic = {
             'water': Water,
@@ -108,31 +121,15 @@ def load_game_window():
             'tree': Stone,
             'floor': Dirt
         }
-        return [[field.Cell(dic[map_of_things[j][i]]) for i in range(1024)] for j in range(1024)]
-#    karte = generate_local_map_of_materials(info)
+        return [[field.Cell(dic[map_of_things[j][i]]) for i in range(1024)] for j in range(1024)]'''
     '''Map initialization'''
-    karte = camera.BigMap('dungeon',10000,10000)
     karte.generate()
-    karte.add_creature(hero, 5000, 5000)
+    karte.add_creature(hero, 1500, 1500)
     from hero import gob
-    karte.add_creature(gob, 5005, 5004)
+    karte.add_creature(gob, 1505, 1504)
     karte.hero = hero
     '''End map init '''
-    big_brother = camera.Camera(dfview.w, dfview.h, karte, hero)
-    def return_back():
-        inventory_window.hide()
-        game_window.get_focus()
-    inventory_window = graphics.Window(0,0, graphics.width, graphics.height, title='Inventory', style='', back=return_back)
-    short_text = 'The forgotten beast Afjbskfb has arrived! It has four wings and its eyes glow red. Beware its poisonous gas!'
-    dic = {keys['i']: lambda: inventory_window.get_focus(),
-           keys['enter']: lambda: MSG.pop(short_text, game_window)}
-    kae = graphics.KeyAcceptorElement(dic)
-    global locator
-    locator = graphics.LabelElement(1,1,'(500, 500)')
-    game_window.add_element(locator)
-    game_window.add_element(kae)
     game_window.get_focus()
-    #inventory_window.get_focus()
     dfview.text_map, dfview.color_map = big_brother.get_screen()
    
 #FIXME The block below must be replaced with actual code, of course
@@ -147,26 +144,7 @@ dfview = graphics.DfViewElement(0,0,graphics.width,graphics.height)
 
 hero = field.hero
 
-def move_hero(x, y):
-    big_brother.field.move_creature(hero, x, y)
-    
-def move_character_right():
-    move_hero(1, 0)
-    dfview.text_map, dfview.color_map = big_brother.get_screen()
-    locator.text = str(big_brother.field.where_is(hero))
-def move_character_left():
-    move_hero(-1, 0)
-    dfview.text_map, dfview.color_map = big_brother.get_screen()
-    locator.text = str(big_brother.field.where_is(hero))
-def move_character_up():
-    move_hero(0, -1)
-    dfview.text_map, dfview.color_map = big_brother.get_screen()
-    locator.text = str(big_brother.field.where_is(hero))
-def move_character_down():
-    move_hero(0, 1)
-    dfview.text_map, dfview.color_map = big_brother.get_screen()
-    locator.text = str(big_brother.field.where_is(hero))
-    
+
     
     
 def player_really_acts(event):

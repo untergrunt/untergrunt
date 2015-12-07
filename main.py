@@ -7,7 +7,7 @@ graphics.reset_log()
 
 graphics.init_graphics()
 windows.load_main_window()
-windows.main_window.draw()
+graphics.Window.draw_windows()
 graphics.win.refresh()
 
 keys = graphics.keys
@@ -19,7 +19,7 @@ def event_manager(event):
         graphics.Window.get_event(event)
         graphics.Window.draw_windows()
         graphics.win.refresh()
-        print(event)
+#        print(event)
     
 
 graphics.interact(event_manager)
