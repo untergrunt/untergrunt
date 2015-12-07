@@ -7,3 +7,6 @@ willpower:WPR:Nothing here
 dexterity:DXT:Nothing here
 focus:FCS:Nothing here
 speed:SPD:Speed
+vision:VSN:The ability to see things
+#Vision determines how many tiles the creature can see if the lighting in 100% of sunlight
+#                                               (it can be more, but creatures won't see farther)

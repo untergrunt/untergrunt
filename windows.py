@@ -91,7 +91,7 @@ def create_game_window():
         'The forgotten beast Afjbskfb has arrived! It has four wings and its eyes glow red. Beware its poisonous gas!'
     dic = {
             keys['i']: lambda: inventory_window.get_focus(),
-            keys['enter']: lambda: MSG.pop(short_text, game_window)
+            keys['k']: lambda: game_window.pass_internal_focus(cursor)
           }
     kae = graphics.KeyAcceptorElement(dic)
     
@@ -104,6 +104,9 @@ def create_game_window():
     locator = graphics.LabelElement(1,1,'(500, 500)')
     karte.add_creature(hero, 1500, 1500)
     big_brother = camera.Camera(dfview.w, dfview.h, karte, hero)
+    def handler(x, y):
+        pass
+    cursor = graphics.CursorElement(0, 0, 20, 20, handler)
     
     def setup_dfview():
         
@@ -123,6 +126,7 @@ def create_game_window():
     game_window.add_element(kae)
     game_window.add_element(dfview)
     game_window.add_element(locator)
+    game_window.add_element(cursor)
     
 def load_game_window():
     global karte, info, big_brother

@@ -1,6 +1,8 @@
 import curses
 
-keys = {'down':258, 'up':259, 'left':260, 'right':261, 'enter': 10, 'esc': 263, 'i':105} #27 - esc, 263 - backspace
+keys = {'down':258, 'up':259, 'left':260, 'right':261, 'enter': 10, 'esc': 263, 'i':105, 'k': 11} #27 - esc, 263 - backspace
+for i in range(97, 123):
+    keys[chr(i)] = i
 
 table_symbols = {'-': '─', '|': '│', 'ul': '┌', 'll': '└', 'ur': '┐', 'lr': '┘'}
 
@@ -140,6 +142,10 @@ class Window:
             Window.focused_window = None
             self.focused_element.lose_focus()
             self.focused_element = None
+    def pass_internal_focus(self, e):
+        assert(e in self.ems)
+        e.get_focus()
+        self.focused_element = e
     def draw(self):
         for x in range(self.x, self.x+self.w):
             for y in range(self.y, self.y+self.h):
@@ -359,6 +365,35 @@ class KeyAcceptorElement(WindowElement):
         pass
     def accept_event(self, event):
         self.dic[event]()
-   
+        
+class CursorElement(WindowElement):
+    def __init__(self, min_x, min_y, max_x, max_y, enter_handler):
+        assert(all(type(i) == int for i in [min_x, min_y, max_x, max_y]))
+        self.min_x, self.min_y, self.max_x, self.max_y = min_x, min_y, max_x, max_y
+        self.x = (min_x + max_x) // 2
+        self.y = (min_y + max_y) // 2
+        self.enter_handler = enter_handler
+    def can_accept_event(self, event):
+        return event in [keys['down'], keys['up'], keys['left'], keys['right'], keys['enter'], keys['esc']]
+    def draw(self):
+        win.addch(self.parent.y + self. y, self.parent.x + self.x, 'X', color_pairs['yellow'])
+    def accept_event(self, event):
+        if event == keys['down']:
+            if self.y < self.max_y:
+                self.y += 1
+        elif event == keys['up']:
+            if self.y > self.min_y:
+                self.y -= 1
+        elif event == keys['right']:
+            if self.x < self.max_x:
+                self.x += 1
+        elif event == keys['left']:
+            if self.x > self.min_x:
+                self.x -= 1   
+        else:
+            self.enter_handler(self.x, self.y)
+            
+            
+            
 init_graphics()
                

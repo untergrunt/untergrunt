@@ -56,6 +56,7 @@ class Creature:
         self.id = Creature.__max_id
         Creature.__reg.append(self)
         self.stats = stats
+        self.vision = self.stats.dic['VSN']
     def get_symbol(self):
         return self.symbol if self.symbol != None else self.race.symbol
     def can_pass_through(self, cell):
@@ -87,7 +88,8 @@ human_stats = Stats({
     'FCS': 10,
     'WPR': 10,
     'DXT': 10,
-    'SPD': 10
+    'SPD': 10,
+    'VSN': 40
 })
 human_race.set_stats(human_stats.copy())   
 goblin_race.set_stats(human_stats.copy()) 
