@@ -1,4 +1,4 @@
-from ai import goblin_AI
+from ai import *
 
 
 class Stats:
@@ -31,9 +31,9 @@ class Race:
         assert(type(stats) == Stats)
         self.stats = stats
 
-human_race = Race('human', 'h', goblin_AI)
-goblin_race = Race('goblin', 'g', goblin_AI)
-dwarven_race = Race('dwarf', 'd', goblin_AI)
+human_race = Race('human', 'h', random_AI)
+goblin_race = Race('goblin', 'g', idiotic_seeker_AI)
+dwarven_race = Race('dwarf', 'd', idiot_AI)
 
 class Creature:
     symbol = None
@@ -57,6 +57,7 @@ class Creature:
         Creature.__reg.append(self)
         self.stats = stats
         self.vision = self.stats.dic['VSN']
+        self.controlled_by_player = False
     def get_symbol(self):
         return self.symbol if self.symbol != None else self.race.symbol
     def can_pass_through(self, cell):

@@ -1,0 +1,60 @@
+properties:
+    color
+    density
+    melting point
+    boiling point
+materials:
+
+name:stone
+	color:white
+	density:1000
+	melting point:2000
+	boiling point:3000
+	
+name:air
+	color:red
+	density:100
+	melting point:-190
+	boiling point:-170
+	
+name:iron
+	color:black
+	density:1000
+	melting point:1000
+	boiling point:1000
+
+name:void
+	color:black
+	density:0
+	melting point:0
+	boiling point:0
+
+name:sand
+	color:yellow
+	density:100
+	melting point:1000
+	boiling point:2000
+	
+name:steel
+	color:silver
+	density:1500
+	melting point:3000
+	boiling point:4000
+
+name:glass
+	color:white
+	density:1000
+	melting point:1000
+	boiling point:2000
+	
+name:water
+	color:blue
+	density:1000
+	melting point:1000
+	boiling point:2000
+	
+name:dirt
+	color:brown
+	density:500
+	melting point:1000
+	boiling point:2000

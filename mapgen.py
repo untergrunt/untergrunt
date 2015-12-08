@@ -109,6 +109,11 @@ class BigMap:
             raise ValueError('Could not find such a creature')
     def get_creatures(self):
         return self.__creatures
+    def get_hero(self):
+        for c in self.__creatures:
+            if Creature.by_id(c).controlled_by_player:
+                return Creature.by_id(c)
+        raise Exception('No hero found')
             
             
             

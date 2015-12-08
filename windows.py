@@ -1,7 +1,6 @@
 import graphics
 import worldgen
 import field
-from materials import Material, Water, Sand, Air, Stone, Void, Dirt
 from tiles import *
 import camera
 from mechanics import player_acts
@@ -107,11 +106,15 @@ def create_game_window():
     def handler(self, x, y):
         cre = karte.get_creatures()
         g_x, g_y = big_brother.to_global((x, y))
-        s = ['floor: {}\nfill: {}\ncoords: ({}, {})'.format(karte.m[g_y][g_x].floor.name, karte.m[g_y][g_x].fill.name, g_x, g_y)]
+        #s = ['floor: {}\nfill: {}\ncoords: ({}, {})'.format(karte.m[g_y][g_x].floor.name, karte.m[g_y][g_x].fill.name, g_x, g_y)]
+        s=[]
+        cell=karte.m[g_y][g_x]
         for k in cre:
             if big_brother.to_local(cre[k]) == (x, y):
-                s += ['Here you see a {}'.format(Creature.by_id(k).race.name)]
+                s += ['Here you see a {} standing on {} surrounded by {}'.format(Creature.by_id(k).race.name, cell.floor.name, cell.fill.name)]
         s = '\n'.join(s)
+        if s == '':
+            s = 'The floor is {}, the fill is {}'.format(cell.floor.name, cell.fill.name)
         MSG.pop(s)
         
     cursor = graphics.CursorElement(0, 0, width-1, height-1, handler)

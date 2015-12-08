@@ -2,6 +2,7 @@ from graphics import MessageBox as MSG
 from field import hero
 from creatures import Creature
 from tweaks import log
+from time import sleep
 #from ai import AI
 
 class Time:
@@ -63,13 +64,22 @@ class Time:
             
 
 def player_acts(command, field):
-    next = Time.after(Creature.by_id(1).get_stat('SPD'), lambda:operate(command, field))
+    if field.get_hero().AI == None:
+        next = Time.after(field.get_hero().get_stat('SPD'), lambda:operate(command, field))
+    else:
+        next = None
+    if field.get_hero().AI != None:
+        sleep(0.01)
+        pass
     for creature in field.get_creatures():
         c = Creature.by_id(creature)
         AI = c.AI
         if AI != None and AI.stuck:
             AI.act(field, Time)
-    t=Time.wait_until_event(next)
+    if next:
+        t=Time.wait_until_event(next)
+    else:
+        Time.wait(t=field.get_hero().get_stat('SPD'))
             
     
         
