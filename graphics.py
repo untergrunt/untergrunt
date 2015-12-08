@@ -37,7 +37,8 @@ def init_graphics():
     curses.init_pair(5, curses.COLOR_YELLOW, curses.COLOR_BLACK)
     curses.init_pair(6, curses.COLOR_MAGENTA, curses.COLOR_BLACK)
     curses.init_pair(7, curses.COLOR_BLUE, curses.COLOR_BLACK)
-    curses.init_pair(8, curses.COLOR_BLACK, curses.COLOR_BLUE)
+    curses.init_color(16, 300, 300, 300)
+    curses.init_pair(8, curses.COLOR_BLACK, 16)
 
     color_pairs = {'normal': curses.color_pair(1), 
                    'highlight': curses.color_pair(2),
@@ -431,6 +432,8 @@ class CursorElement(WindowElement):
     def handler(self, x, y):
         pass
     def get_focus(self):
+        self.x = (self.min_x + self.max_x) // 2
+        self.y = (self.min_y + self.max_y) // 2        
         self.has_focus = True
         self.parent.pass_internal_focus(self)
         self.visible = True

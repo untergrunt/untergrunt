@@ -100,14 +100,14 @@ def create_game_window():
         game_window.get_focus()
         
     inventory_window = graphics.Window(0,0, width, height, title='Inventory', style='', back=return_back)
-    karte = camera.BigMap('dungeon',3000,3000)
+    karte = camera.BigMap('dungeon',1000,1000)
     locator = graphics.LabelElement(1,1,'(500, 500)')
-    karte.add_creature(hero, 1500, 1500)
+    karte.add_creature(hero, 500, 500)
     big_brother = camera.Camera(dfview.w, dfview.h, karte, hero)
     def handler(self, x, y):
         cre = karte.get_creatures()
         g_x, g_y = big_brother.to_global((x, y))
-        s = ['floor: {}\nfill: {}\ncoords: ({}, {})'.format(karte.m[g_x][g_y].floor.name, karte.m[g_x][g_y].fill.name, g_x, g_y)]
+        s = ['floor: {}\nfill: {}\ncoords: ({}, {})'.format(karte.m[g_y][g_x].floor.name, karte.m[g_y][g_x].fill.name, g_x, g_y)]
         for k in cre:
             if big_brother.to_local(cre[k]) == (x, y):
                 s += ['Here you see a {}'.format(Creature.by_id(k).race.name)]
@@ -139,8 +139,8 @@ def load_game_window():
     from hero import gob
     '''Map initialization'''
     karte.generate()
-    karte.add_creature(hero, 1500, 1500)
-    karte.add_creature(gob, 1505, 1504)
+    karte.add_creature(hero, 500, 500)
+    karte.add_creature(gob, 505, 504)
     karte.hero = hero
     '''End map initializasion '''
     game_window.reset()

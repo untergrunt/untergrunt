@@ -34,17 +34,29 @@ class BigMap:
     def ready(self):
         return self.__ready
     def generate_dungeon(w, h):
-        bm = [[Cell('water','stone')] * w for i in range(h)]
-        for y in range(1450,1550):
-            for x in range(1450,1550):
-                bm[y][x] = Cell('stone','air')
+        bm = [[Cell('stone','air') for j in range(w)] for i in range(h)]
+        for i in range(1,25):
+                for k in range(w):
+                    bm[(h-1)//25 * i][k] = Cell('stone','stone')
+                    bm[k][(w-1)//25 * i] = Cell('stone','stone')
+        for i in range(1,25):
+                for k in range(100,w-100):
+                    bm[(h-1)//25 * i + 5][k] = Cell('stone','air')
+                    bm[k][(w-1)//25 * i + 5] = Cell('stone','air')
         return bm
     def generate_village(w, h): #TODO
         pass
     def generate_lenoblast(w, h): #TODO
         pass
     def generate_plane(w, h):
-        m = [[Cell('stone','air') for i in range(w)] for j in range(h)]
+        m = [[Cell('dirt','air') for i in range(w)] for j in range(h)]
+        for x in range((w-20)//2,(w+20)//2):
+            m[(h-20)//2][x] = Cell('stone','stone')
+            m[(h+20)//2][x] = Cell('stone','stone')
+        for y in range((h-20)//2,(h+22)//2):
+            m[y][(w-20)//2] = Cell('stone','iron')
+            m[y][(w+20)//2] = Cell('stone','stone')
+        m[(w-20)//2][h//2] = Cell('stone','air')
         return m
     def save(self, fname='world'):
         files = listdir('save')
