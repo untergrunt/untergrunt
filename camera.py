@@ -1,10 +1,11 @@
 
 from hero import *
 #from random import randint
-from tiles import *
 from mapgen import BigMap
 from graphics import print, height, width
 from creatures import Creature
+from parse import read_tiles
+ascii = read_tiles()
 
 class Camera: #Keeps track of the hero, tells what part of the field to show
     def __init__(self, w, h, field, actor): #Field is a BigMap object

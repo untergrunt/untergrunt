@@ -25,3 +25,13 @@ def read_materials(fname):
                 if x == p:
                     d[x] = y
     return mats
+    
+def read_tiles():
+    from tweaks import read_file
+    ascii = {}
+    text = read_file('ascii_tiles.txt').split('\n')
+    for match in text:
+        if match == '': continue
+        assert(match.split() == [match[:-2], match[-1]])
+        ascii[match[:-2]] = match[-1]
+    return ascii

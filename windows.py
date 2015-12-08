@@ -1,10 +1,11 @@
 import graphics
 import worldgen
 import field
-from tiles import *
 import camera
 from mechanics import player_acts
 from creatures import Creature
+
+ascii = camera.ascii
 
 print = graphics.print
 
