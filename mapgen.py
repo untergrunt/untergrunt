@@ -128,7 +128,7 @@ class BigMap:
                     
     def visible_by(self, c, x, y, lt):
             x0, y0 = self.where_is(c)
-            d_max = 2 + round(c.vision * (lt/100) ** 0.5)
+            d_max = round(c.vision * (lt/100) ** 0.5)
             if (x-x0)**2 + (y-y0)**2 > d_max**2:
                 return False
             if x == x0:

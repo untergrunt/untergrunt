@@ -32,7 +32,7 @@ class Race:
         self.stats = stats
 
 human_race = Race('human', 'h', random_AI)
-goblin_race = Race('goblin', 'g', idiotic_seeker_AI)
+goblin_race = Race('goblin', 'g', seeker_AI)
 dwarven_race = Race('dwarf', 'd', idiot_AI)
 
 class Creature:
