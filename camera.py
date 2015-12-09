@@ -26,25 +26,18 @@ class Camera: #Keeps track of the hero, tells what part of the field to show
     def get_screen(self): #returns a tuple of two 2d lists: charmap and colormap
         self.update()
         def symbol_on_cell(cell):
-            '''
-            if cell.fill.name in ['air', 'void']: #Draw what is on the floor
-                if cell.floor.name == 'water':
-                    return '~'
-                else:
-                    return '.'
-            else:
-                if cell.fill.name == 'stone':
-                    return '#'
-                else:
-                    return '!'
-           '''
             return str(cell)
+        def symbol_on_point(x, y):
+            if self.field.visible_by(self.actor, x, y):
+                return str(self.field.m[y][x])
+            else:
+                return '?'
         def color_on_cell(cell):
             if cell.fill.name in ['air', 'void']:
                 return cell.floor.color
             else:
                 return cell.fill.color
-        charmap = [[symbol_on_cell(self.field.m[y][x]) for x in range(self.x, self.x + self.w)] for y in range(self.y, self.y + self.h)]
+        charmap = [[symbol_on_point(x, y) for x in range(self.x, self.x + self.w)] for y in range(self.y, self.y + self.h)]
         colormap = [[color_on_cell(self.field.m[y][x]) for x in range(self.x, self.x + self.w)] for y in range(self.y, self.y + self.h)]
         x, y = self.field.where_is(self.actor)
         for c in self.field.get_creatures():
@@ -52,8 +45,9 @@ class Camera: #Keeps track of the hero, tells what part of the field to show
             if z:
                 zx, zy = self.field.where_is(z)
                 if ((zy - self.y) in range(height)) and ((zx - self.x) in range(width)):
-                    charmap[zy - self.y][zx - self.x] = z.get_symbol()
-                    colormap[zy - self.y][zx - self.x] = 'white'
+                    if self.field.visible_by(self.actor, zx, zy):
+                        charmap[zy - self.y][zx - self.x] = z.get_symbol()
+                        colormap[zy - self.y][zx - self.x] = 'white'
         x, y = self.field.where_is(self.actor)
         charmap[y - self.y][x - self.x] = self.actor.get_symbol()
         colormap[y - self.y][x - self.x] = 'green'

@@ -1,5 +1,5 @@
 from graphics import MessageBox as MSG
-from field import hero
+from hero import hero
 from creatures import Creature
 from tweaks import log
 from time import sleep

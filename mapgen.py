@@ -1,6 +1,7 @@
 from field import *
 from graphics import print
 from os import mkdir, listdir
+from creatures import Creature
 
 class BigMap:
     '''
@@ -114,7 +115,56 @@ class BigMap:
             if Creature.by_id(c).controlled_by_player:
                 return Creature.by_id(c)
         raise Exception('No hero found')
-            
+    def fov(self, c):
+        x0, y0 = self.where_is(c)
+        d_max = c.vision
+        f = [[None]*(d_max*2) for i in range(2*d_max)]
+        for i in range(2*d_max):
+            xl = i
+            yl = 0
+            #xg = xl + x0 - d_max
+            #yg = yl + x0 - d_max
+                
+                    
+    def visible_by(self, c, x, y):
+            x0, y0 = self.where_is(c)
+            d_max = round(c.vision * (self.m[y][x].light/100) ** 0.5)
+            if (x-x0)**2 + (y-y0)**2 > d_max**2:
+                return False
+            if x == x0:
+                vis = True
+                y1, y2 = sorted((y, y0))
+                for k in range(y1+1,y2):
+                    vis &= self.m[k][x].fill.name == 'air'
+                return vis
+            elif y == y0:
+                vis = True
+                x1, x2 = sorted((x, x0))
+                for k in range(x1+1,x2):
+                    vis &= self.m[y][k].fill.name == 'air'
+                return vis
+            dy = abs(y0 - y)
+            dx = abs(x0 - x)
+            vis1 = True
+            vis2 = True
+            vis3 = True
+            if dy < dx:
+                x1, x2 = sorted((x0, x))
+                y1, y2 = sorted((y, y0))
+                for i in range(x1 + 1, x2 ):
+                    yy = y1 + round((y2-y1)*(x2-i)/(x2-x1))
+                    vis1 &= self.m[yy][i].fill.name == 'air'
+                    vis2 &= self.m[yy+1][i].fill.name == 'air'
+                    vis3 &= self.m[yy-1][i].fill.name == 'air'
+            else:
+                x1, x2 = sorted((x0, x))
+                y1, y2 = sorted((y, y0))
+                for i in range(y1 + 1, y2 ):
+                    xx = x1 + round((x2-x1)*(y2-i)/(y2-y1))
+                    vis1 &= self.m[i][xx].fill.name == 'air'
+                    vis2 &= self.m[i][xx + 1].fill.name == 'air'
+                    vis3 &= self.m[i][xx - 1].fill.name == 'air'
+            return vis1 and (vis2 or vis3)
             
             
     

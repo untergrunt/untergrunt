@@ -1,8 +1,4 @@
 from materials import Material as mat
-from hero import *
-#from random import randint
-#from tiles import *
-#from mapgen import BigMap
 
 class Cell: #Stores data about one cell
     floor = mat.by_name('stone')
@@ -22,6 +18,7 @@ class Cell: #Stores data about one cell
                 raise ValueError('Expected a material, got', type(fill))
         self.floor = floor
         self.fill = fill
+        self.light = 10
     def __str__(self):
         if self.fill.name not in ['air', 'void']:
             return '#'
@@ -29,5 +26,3 @@ class Cell: #Stores data about one cell
             return '~'
         else:
             return '.'
-    
-

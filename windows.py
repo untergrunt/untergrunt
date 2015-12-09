@@ -4,6 +4,7 @@ import field
 import camera
 from mechanics import player_acts
 from creatures import Creature
+from hero import hero
 
 ascii = camera.ascii
 
@@ -84,7 +85,7 @@ def create_game_window():
     global dfview
     global hero
     MSG.back = game_window
-    hero = field.hero
+    hero = hero
     dfview = graphics.DfViewElement(0, 0, width, height)
     short_text = \
         'The forgotten beast Afjbskfb has arrived! It has four wings and its eyes glow red. Beware its poisonous gas!'
