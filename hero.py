@@ -7,3 +7,4 @@ hero.stats.dic['SPD'] = 10
 hero.controlled_by_player = True
 
 gob = Creature(goblin_race, 'Atol')
+gob.light = 40

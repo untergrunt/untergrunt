@@ -18,7 +18,7 @@ class Cell: #Stores data about one cell
                 raise ValueError('Expected a material, got', type(fill))
         self.floor = floor
         self.fill = fill
-        self.light = 10
+        self.light = 0
     def __str__(self):
         if self.fill.name not in ['air', 'void']:
             return '#'

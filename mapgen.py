@@ -126,9 +126,9 @@ class BigMap:
             #yg = yl + x0 - d_max
                 
                     
-    def visible_by(self, c, x, y):
+    def visible_by(self, c, x, y, lt):
             x0, y0 = self.where_is(c)
-            d_max = round(c.vision * (self.m[y][x].light/100) ** 0.5)
+            d_max = 2 + round(c.vision * (lt/100) ** 0.5)
             if (x-x0)**2 + (y-y0)**2 > d_max**2:
                 return False
             if x == x0:
@@ -165,6 +165,45 @@ class BigMap:
                     vis2 &= self.m[i][xx + 1].fill.name == 'air'
                     vis3 &= self.m[i][xx - 1].fill.name == 'air'
             return vis1 and (vis2 or vis3)
+'''    def visible_by(self, c, x, y):
+            x_s, y_s = x, y
+            x0, y0 = self.where_is(c)
+            x0, x = sorted((x0, x)) #x0 <= x
+            y0, y = sorted((y0, y)) #y0 <= y
+            d_max = round(c.vision * (self.m[y][x].light/100) ** 0.5)
+            if (x-x0)**2 + (y-y0)**2 > d_max**2:
+                return False
+            if x == x0:
+                vis = True
+                y1, y2 = sorted((y, y0))
+                for k in range(y1+1,y2):
+                    vis &= self.m[k][x].fill.name == 'air'
+                return vis
+            elif y == y0:
+                vis = True
+                x1, x2 = sorted((x, x0))
+                for k in range(x1+1,x2):
+                    vis &= self.m[y][k].fill.name == 'air'
+                return vis
+            x1, y1 = x0 + 0.5, y0 + 0.5 #x1 <= x2
+            x2, y2 = x + 0.5, y + 0.5   #y1 <= y2
+            for xx in range(x0 + 1, x):
+                yy = int(y1 + (xx - x1)*(y2 - y1)/(x2 - x1))
+                if self.m[yy][xx-1].fill.name != 'air':
+                    if xx != x0 + 1 and xx != x - 1:
+                        return False
+                if self.m[yy][xx].fill.name != 'air':
+                    return False
+            for yy in range(y0 + 1, y):
+                xx = int(x1 + (yy - y1)*(x2 - x1)/(y2 - y1))
+                if self.m[yy-1][xx].fill.name != 'air':
+                    if yy != y0 + 1 and yy != y - 1:
+                        return False
+                if self.m[yy][xx].fill.name != 'air':
+                    return False
+            return True'''
+            
+            
             
             
     

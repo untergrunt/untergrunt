@@ -58,6 +58,7 @@ class Creature:
         self.stats = stats
         self.vision = self.stats.dic['VSN']
         self.controlled_by_player = False
+        self.light = 0
     def get_symbol(self):
         return self.symbol if self.symbol != None else self.race.symbol
     def can_pass_through(self, cell):
