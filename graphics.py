@@ -17,6 +17,7 @@ def print(*args, end='\n'):
 def reset_log():
     log = open('log.txt', 'w')
     log.close()
+    pass
 
 def init_graphics():
     global stdscr, win, height, width, color_pairs
@@ -31,18 +32,24 @@ def init_graphics():
     width = curses.COLS
     win = curses.newwin(height+1, width+1, begin_y, begin_x)
 
-    curses.init_pair(1, curses.COLOR_WHITE, curses.COLOR_BLACK)
-    curses.init_pair(2, curses.COLOR_BLACK, curses.COLOR_WHITE)
-    curses.init_pair(3, curses.COLOR_RED, curses.COLOR_BLACK)
-    
-    colors = list(parse.read_colors().items())
-    for i in range(len(colors)):
+    cls = parse.read_colors()
+    colors = [(i[0], i[1][1:]) for i in sorted(list(cls.items()), key=lambda x: x[1][0])]
+    color_number = len(colors)
+    print(colors)
+    cls = {}
+    for i in range(color_number):
         curses.init_color(16+i, *colors[i][1])
-        curses.init_pair(16+i, 16+i, curses.COLOR_BLACK)
-    color_pairs = {colors[i][0]: curses.color_pair(16+i) for i in range(len(colors))}
-    color_pairs['normal'] = curses.color_pair(1)
-    color_pairs['highlight'] = curses.color_pair(2)
-    color_pairs['attention'] = curses.color_pair(3)
+        cls[colors[i][0]]=16+i
+    print(cls)
+    color_pairs = {}
+    for i in range(color_number):
+        for j in range(color_number):
+            curses.init_pair(16+i*16+j, cls[colors[i][0]], cls[colors[j][0]])
+            color_pairs[colors[i][0] + '+' + colors[j][0]] = curses.color_pair(16+i*16+j)
+            
+init_graphics()
+bgcolor = 'dark_gray'
+fgcolor = 'white'
 
 def die():
     curses.nocbreak()
@@ -162,9 +169,9 @@ class Window:
     def draw(self):
         for x in range(self.x, self.x+self.w):
             for y in range(self.y, self.y+self.h):
-                win.addch(y,x,' ')
+                win.addch(y,x,' ',color_pairs[fgcolor + '+'+bgcolor])
         if not self.noborder:
-            stl = color_pairs['red'] if self.red else 0
+            stl = color_pairs['red+'+bgcolor] if self.red else color_pairs[fgcolor + '+'+bgcolor]
             for x in [self.x, self.x + self.w - 1]:
                 for y in range(self.y, self.y+self.h):
                     win.addch(y,x,table_symbols['|'], stl)
@@ -175,7 +182,7 @@ class Window:
             win.addch(self.y + self.h - 1, self.x, table_symbols['ll'], stl)
             win.addch(self.y, self.x + self.w - 1, table_symbols['ur'], stl)
             win.addch(self.y + self.h - 1, self.x + self.w - 1, table_symbols['lr'], stl)
-            stl = curses.A_BOLD if self.bold else 0
+            stl += curses.A_BOLD if self.bold else 0
             for x in range(len(self.title)):
                     win.addch(self.y,self.x + (self.w - len(self.title))//2 + x,self.title[x], stl)
         for e in self.ems:
@@ -263,7 +270,9 @@ class LabelElement(WindowElement):
         for i in range(len(self.text)):
             mod = 0
             if self.bold: mod += curses.A_BOLD
-            if self.red: mod += color_pairs['attention']
+            if self.red: mod += color_pairs['red+'+bgcolor]
+            else:
+                mod += color_pairs[fgcolor + '+'+bgcolor]
             win.addch(self.parent.y + self.y, self.parent.x + self.x + i, self.text[i], mod)
             
 class TextElement(WindowElement):
@@ -277,7 +286,8 @@ class TextElement(WindowElement):
         if not isinstance(self.parent, Window): raise ValueError('Cannot draw a TextElement without a parent')
         mod = 0
         if self.bold: mod += curses.A_BOLD
-        if self.red: mod += color_pairs['attention']
+        if self.red: mod += color_pairs['red+'+bgcolor]
+        else: mod += color_pairs[fgcolor + '+'+bgcolor]
         parts = self.text.split('\n')
         for z in range(len(parts)):
             part = parts[z]
@@ -309,8 +319,14 @@ class VerticalMenuElement(WindowElement):
         elif event == keys['enter']:
             if self.focused_element != None:
                 self.bindings[self.focused_element][1]()
-    def __init__(self, x, y, bindings): #Bindings is a list of tuples: [(text, command-function), ...]
+    def __init__(self, x, y, bindings, cls=
+        {
+            'normal': color_pairs[fgcolor + '+'+bgcolor],
+            'selected': color_pairs[bgcolor+'+white'],
+        }): #Bindings is a list of tuples: [(text, command-function), ...]
         self.x, self.y = x, y
+        self.cls = cls
+        print('===', cls)
         self.bindings = bindings
         assert(all('\n' not in i for i in bindings))
         self.can_accept_focus = True
@@ -343,9 +359,11 @@ class VerticalMenuElement(WindowElement):
         for n in range(len(self.bindings)):
             for i in range(len(self.bindings[n][0])):
                 if self.focused_element == n:
-                    win.addch(self.parent.y + self.y + n, self.parent.x + self.x + i, self.bindings[n][0][i], color_pairs['highlight'])
+                    stl = self.cls['selected']
+                    win.addch(self.parent.y + self.y + n, self.parent.x + self.x + i, self.bindings[n][0][i], stl)
                 else:
-                    win.addch(self.parent.y + self.y + n, self.parent.x + self.x + i, self.bindings[n][0][i])   
+                    stl = self.cls['normal']
+                    win.addch(self.parent.y + self.y + n, self.parent.x + self.x + i, self.bindings[n][0][i], stl)   
     
 class DfViewElement(WindowElement):
     def can_accept_event(self, event):
@@ -377,7 +395,7 @@ class DfViewElement(WindowElement):
         #print(self.text_map)
         for x in range(self.w):
             for y in range(self.h):
-                win.addch(self.parent.y + self.y + y, self.parent.x + self.x + x, self.text_map[y][x], color_pairs[self.color_map[y][x]])
+                win.addch(self.parent.y + self.y + y, self.parent.x + self.x + x, self.text_map[y][x], color_pairs[self.color_map[y][x]+'+'+bgcolor])
                 
 class KeyAcceptorElement(WindowElement):
     def __init__(self, dic):
@@ -402,7 +420,7 @@ class CursorElement(WindowElement):
     def can_accept_event(self, event):
         return event in [keys['down'], keys['up'], keys['left'], keys['right'], keys['enter'], keys['esc']]
     def draw(self):
-        win.addch(self.parent.y + self. y, self.parent.x + self.x, 'X', color_pairs['red'])
+        win.addch(self.parent.y + self. y, self.parent.x + self.x, 'X', color_pairs['red+'+bgcolor])
     def accept_event(self, event):
         if event == keys['down']:
             if self.y < self.max_y:

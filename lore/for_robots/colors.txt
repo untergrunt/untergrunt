@@ -1,7 +1,10 @@
-red dd 00 00
-green 00 b0 40
-blue 00 00 ff
-white dd dd dd
-black 00 00 00
-yellow dd dd 00
-brown aa 77 00
+1 red dd 00 00
+2 green 00 b0 40
+3 blue 00 00 ff
+4 white dd dd dd
+5 black 00 00 00
+6 yellow dd dd 00
+7 brown aa 77 00
+8 light_gray 80 80 80
+9 gray 40 40 40
+10 dark_gray 20 20 20

@@ -44,8 +44,8 @@ def read_colors():
     for line in lines:
         if line == '' or '#' in line:
             continue
-        name, R, G, B = line.split(' ')
-        colors[name] = tuple(int(int(CL, 16) * 1000 / 255) for CL in (R, G, B))
+        num, name, R, G, B = line.split(' ')
+        colors[name] = (int(num),) + tuple(int(int(CL, 16) * 1000 / 255) for CL in (R, G, B))
     return colors
     
     
