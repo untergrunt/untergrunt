@@ -6,7 +6,7 @@ properties:
 materials:
 
 name:stone
-	color:white
+	color:brown
 	density:1000
 	melting point:2000
 	boiling point:3000

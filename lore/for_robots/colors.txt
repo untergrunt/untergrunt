@@ -1,0 +1,7 @@
+red dd 00 00
+green 00 b0 40
+blue 00 00 ff
+white dd dd dd
+black 00 00 00
+yellow dd dd 00
+brown aa 77 00

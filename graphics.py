@@ -1,4 +1,5 @@
 import curses
+import parse
 
 keys = {'down':258, 'up':259, 'left':260, 'right':261, 'enter': 10, 'esc': 263, 'i':105, 'k': 11, '.': 46} #27 - esc, 263 - backspace
 for i in range(97, 123):
@@ -33,23 +34,15 @@ def init_graphics():
     curses.init_pair(1, curses.COLOR_WHITE, curses.COLOR_BLACK)
     curses.init_pair(2, curses.COLOR_BLACK, curses.COLOR_WHITE)
     curses.init_pair(3, curses.COLOR_RED, curses.COLOR_BLACK)
-    curses.init_pair(4, curses.COLOR_GREEN, curses.COLOR_BLACK)
-    curses.init_pair(5, curses.COLOR_YELLOW, curses.COLOR_BLACK)
-    curses.init_pair(6, curses.COLOR_MAGENTA, curses.COLOR_BLACK)
-    curses.init_pair(7, curses.COLOR_BLUE, curses.COLOR_BLACK)
-    curses.init_color(16, 300, 300, 300)
-    curses.init_pair(8, curses.COLOR_BLACK, 16)
-
-    color_pairs = {'normal': curses.color_pair(1), 
-                   'highlight': curses.color_pair(2),
-                   'red': curses.color_pair(3),
-                   'attention': curses.color_pair(3),
-                   'green': curses.color_pair(4),
-                   'yellow': curses.color_pair(5),
-                   'white': curses.color_pair(1),
-                   'brown': curses.color_pair(6),
-                   'blue': curses.color_pair(7),
-                   'black': curses.color_pair(8)}
+    
+    colors = list(parse.read_colors().items())
+    for i in range(len(colors)):
+        curses.init_color(16+i, *colors[i][1])
+        curses.init_pair(16+i, 16+i, curses.COLOR_BLACK)
+    color_pairs = {colors[i][0]: curses.color_pair(16+i) for i in range(len(colors))}
+    color_pairs['normal'] = curses.color_pair(1)
+    color_pairs['highlight'] = curses.color_pair(2)
+    color_pairs['attention'] = curses.color_pair(3)
 
 def die():
     curses.nocbreak()

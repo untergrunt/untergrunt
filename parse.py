@@ -1,4 +1,5 @@
-def read_materials(fname):
+def read_materials():
+    fname = './lore/for_robots/materials.txt'
     I = open(fname, 'r')
     props = []
     mats = []
@@ -35,3 +36,20 @@ def read_tiles():
         assert(match.split() == [match[:-2], match[-1]])
         ascii[match[:-2]] = match[-1]
     return ascii
+    
+def read_colors():
+    from tweaks import read_file
+    colors = {}
+    lines = read_file('./lore/for_robots/colors.txt').split('\n')
+    for line in lines:
+        if line == '' or '#' in line:
+            continue
+        name, R, G, B = line.split(' ')
+        colors[name] = tuple(int(int(CL, 16) * 1000 / 255) for CL in (R, G, B))
+    return colors
+    
+    
+    
+    
+    
+    

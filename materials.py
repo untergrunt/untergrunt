@@ -22,8 +22,6 @@ class Material:
         
 
 from parse import read_materials
-#from tweaks import log
 
-for mat in read_materials('./lore/for_robots/materials.txt'):
+for mat in read_materials():
     a=Material(mat)
-    #log(a.name, f='mat.txt')
