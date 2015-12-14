@@ -1,5 +1,5 @@
 from ai import *
-
+from tweaks import log
 
 class Stats:
     possible = []
@@ -35,11 +35,52 @@ human_race = Race('human', 'h', random_AI)
 goblin_race = Race('goblin', 'g', seeker_AI)
 dwarven_race = Race('dwarf', 'd', idiot_AI)
 
+class BodyPart:
+    def __init__(self, name, size, functions):
+        self.name = name
+        self.size = size
+        self.functions = functions
+        self.health = 100 #100 is excelent, 0 is gone, <50 is a serious malfunction
+        #Which functions are vital is decided for each creature depending on its needs
+        #Damage is also stored here
+    def clone(self):
+        return BodyPart(self.name, self.size, self.functions)  #A fully healed copy
+    def take_damage(self, dmg):
+        assert(dmg >= 0)
+        self.health -= dmg
+        log(self.name, 'takes', dmg, 'damage', f='log')
+
+heart = BodyPart('heart', '0.5', ['blood pressure'])
+brain = BodyPart('brain', '2', ['consciousness', 'perception', 'control'])
+skin = BodyPart('skin', '10', ['disease resistance', 'protection'])
+
+class Body:
+    def __init__(self, parts, root, connect): #Connect is a list of tuples, each of them contains a pair of
+                                              #connected organs from root to skin (e.g. (brain, skull))
+        self.parts = [i.clone() for i in parts]
+        self.root = root.clone()
+        self.connect = connect #A crutch for cloning
+        for i in self.parts:
+            i.outside = []
+            i.inside = []
+            for fro,to in connect:
+                if i.name == fro.name:
+                    i.outside.append(to)
+                elif i.name == to.name:
+                    i.inside.append(fro)
+    def clone(self):
+        return Body([i.clone() for i in self.parts], self.root.clone(), self.connect[:])
+                
+bdy = Body([heart, brain, skin], brain, [(brain, heart), (brain, skin), (heart, skin)])
+
 class Creature:
     symbol = None
     __max_id = 0
     __reg = []
-    def __init__(self, race, name, stats=None, ai=None):
+    def __init__(self, race, name, body_template, stats=None, ai=None):
+        for i in Creature.__reg:
+            if i.name == name:
+                raise ValueError()
         if stats == None:
             stats = race.stats
         if ai == None:
@@ -50,7 +91,12 @@ class Creature:
             self.AI = ai
         assert(isinstance(race, Race))
         assert(type(name) == str)
+        self.needs = set()
+        self.body = body_template.clone()
+        for p in self.body.parts:
+            self.needs.add(p)
         self.race = race
+        self.alive = True
         self.name = name
         Creature.__max_id += 1
         self.id = Creature.__max_id
@@ -59,6 +105,40 @@ class Creature:
         self.vision = self.stats.dic['VSN']
         self.controlled_by_player = False
         self.light = 0
+        self.effects = []
+        self.check_health()
+    def check_health(self):
+        functions = set()
+        for p in self.body.parts:
+            if p.health <= 0:
+                q = [p]
+                while q != []:
+                    exit()
+                    curr, q = q[0], q[1:]
+                    for i in curr.outside:
+                        if i.inside == [curr] and i not in q:
+                            q.append(i)
+                    self.body.parts.remove(curr)
+                    if curr == self.root:
+                        return False
+            else:
+                log(self.name, p.name, 'is OK, health is', p.health, f='log')
+        for p in self.body.parts:
+            functions.add(p)
+        if functions == self.needs:
+            return True
+        else:
+            self.effects = {}
+            for i in self.needs - functions:
+                if i == 'vision':
+                    self.effects.add('blind')
+                elif i == 'consciousness':
+                    self.effects.add('unconscious')
+                elif i == 'control':
+                    return False
+                elif i == 'blood pressure':
+                    return False
+        
     def get_symbol(self):
         return self.symbol if self.symbol != None else self.race.symbol
     def can_pass_through(self, cell):
@@ -66,6 +146,10 @@ class Creature:
         if cell.fill.name not in ['air', 'void']: return False
         if cell.statics != None and [True for i in cell.statics if not i.passible] != []: return False
         return True
+    def die(self):
+        self.AI = None
+#        self.controlled_by_player = False
+        self.alive = False
     def where_is(self):
         try:
             return (self.x, self.y)

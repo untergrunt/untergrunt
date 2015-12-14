@@ -1,14 +1,14 @@
 from creatures import *
         
-hero = Creature(human_race, 'Urist')
+hero = Creature(human_race, 'Urist', bdy)
 hero.symbol = '@'
 hero.AI = None#random_AI(hero)
 hero.stats.dic['SPD'] = 9
 hero.controlled_by_player = True
 
-gob = Creature(goblin_race, 'Atol')
+gob = Creature(goblin_race, 'Kek', bdy)
 gob.light = 0#100
 
-hero.light = 0#100
+hero.light = 100
 
-gob.AI = None
+gob.AI = seeker_AI(gob)

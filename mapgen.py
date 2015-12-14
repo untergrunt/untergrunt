@@ -23,7 +23,7 @@ class BigMap:
         self.h = h
         self.__ready = False
         self.__creatures = []
-        self.ambient_light = 30
+        self.ambient_light = 0
         self.lightmap = [[self.ambient_light]*w for i in range(h)]
         self.sources = None
         self.statics = []
@@ -95,6 +95,8 @@ class BigMap:
         if creature.id not in self.__creatures:
             self.__creatures.append(creature.id)
         creature.position = (x,y)
+    def remove_creature(self, c):
+        pass
     def knows(self, creature):
         return creature.id in self.__creatures
     def move_creature(self, creature, x, y):
@@ -117,7 +119,7 @@ class BigMap:
         except:
             raise ValueError('Could not find such a creature')
     def get_creatures(self):
-        return self.__creatures
+        return [Creature.by_id(c) for c in self.__creatures]
     def get_hero(self):
         for c in self.__creatures:
             if Creature.by_id(c).controlled_by_player:

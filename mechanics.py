@@ -47,6 +47,10 @@ class Time:
             Time.times = Time.times[count:]
             Time.actions = Time.actions[count:]
             Time.ids = Time.ids[count:]
+            for c in karte.get_creatures():
+                if not c.check_health():
+                    c.die()
+                    karte.remove_creature(c)
     def wait_until_next_event():
         if Time.times == []: return
         Time.now = Time.times[0]
@@ -67,14 +71,17 @@ class Time:
 
 def player_acts(command, field):
     if field.get_hero().AI == None:
-        next = Time.after(field.get_hero().get_stat('SPD'), lambda:operate(command, field))
+        if hero.alive:
+            next = Time.after(field.get_hero().get_stat('SPD'), lambda:operate(command, field))
+        else:
+            next = Time.after(field.get_hero().get_stat('SPD'), lambda:operate('wait', field))
+            MSG.pop('You are dead')
     else:
         next = None
     if field.get_hero().AI != None:
         sleep(0.01)
         pass
-    for creature in field.get_creatures():
-        c = Creature.by_id(creature)
+    for c in field.get_creatures():
         AI = c.AI
         if AI != None and AI.stuck:
             AI.act(field, Time)
@@ -83,13 +90,13 @@ def player_acts(command, field):
     else:
         Time.wait(t=field.get_hero().get_stat('SPD'))
         
-
-    
-            
     
         
 def operate(command, field):
-    if command == 'down':
+    if command == 'commit suicide':
+        hero.die()
+        MSG.pop('You have just died')
+    elif command == 'down':
         if not field.move_creature(hero, 0, 1):
             MSG.pop('You can\'t walk there!')
     elif command == 'up':

@@ -3,7 +3,7 @@ import field
 import camera
 from mechanics import player_acts
 from creatures import Creature
-from hero import hero
+from hero import hero, gob
 
 ascii = camera.ascii
 
@@ -112,8 +112,8 @@ def create_game_window():
         s=[]
         cell=karte.m[g_y][g_x]
         for k in cre:
-            if big_brother.to_local(cre[k]) == (x, y):
-                s += ['Here you see a {} standing on {} surrounded by {}'.format(Creature.by_id(k).race.name, cell.floor.name, cell.fill.name)]
+            if big_brother.to_local(k.position) == (x, y):
+                s += ['Here you see a {} standing on {} surrounded by {}'.format(k.race.name, cell.floor.name, cell.fill.name)]
         s = '\n'.join(s)
         if s == '':
             s = 'The floor is {}, the fill is {}'.format(cell.floor.name, cell.fill.name)
@@ -122,7 +122,7 @@ def create_game_window():
     cursor = graphics.CursorElement(0, 0, width-1, height-1, handler)
     
     def setup_dfview():
-        dfview.accepts_keys = [keys['down'], keys['up'], keys['left'], keys['right'], keys['.'], keys['o'], keys['c']]
+        dfview.accepts_keys = [keys['down'], keys['up'], keys['left'], keys['right'], keys['.'], keys['o'], keys['c'], keys['d']]
         dfview.actions = {
             keys['down']: lambda:let_the_player_act_and_pass_the_changes_to_the_dfview('down'),
             keys['up']: lambda:let_the_player_act_and_pass_the_changes_to_the_dfview('up'),
@@ -130,7 +130,8 @@ def create_game_window():
             keys['right']: lambda:let_the_player_act_and_pass_the_changes_to_the_dfview('right'),
             keys['.']: lambda:let_the_player_act_and_pass_the_changes_to_the_dfview('wait'),
             keys['o']: lambda:let_the_player_act_and_pass_the_changes_to_the_dfview('open door'),
-            keys['c']: lambda:let_the_player_act_and_pass_the_changes_to_the_dfview('close door')
+            keys['c']: lambda:let_the_player_act_and_pass_the_changes_to_the_dfview('close door'),
+            keys['d']: lambda:let_the_player_act_and_pass_the_changes_to_the_dfview('commit suicide')
         }
         dfview.can_accept_focus = True
         
@@ -143,7 +144,6 @@ def create_game_window():
     
 def load_game_window():
     global karte, info, big_brother
-    from hero import gob
     '''Map initialization'''
     karte.generate()
     karte.add_creature(hero, 500, 500)
@@ -152,7 +152,6 @@ def load_game_window():
     '''End map initializasion '''
     game_window.reset()
     game_window.get_focus()
-#    big_brother.actor = gob #For fun
     dfview.text_map, dfview.color_map = big_brother.get_screen()
     
     

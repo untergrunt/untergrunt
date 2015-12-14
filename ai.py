@@ -31,7 +31,7 @@ class idiot_AI(AI):
     def act(self, circumstances, Time):
         self.stuck = False
         Time.after(self.who.get_stat('SPD'), lambda:self.act(circumstances, Time))
-        x, y = circumstances.where_is(self.who)
+        x, y = self.who.position
         l = circumstances.can_move_creature(self.who, -1, 0)
         r = circumstances.can_move_creature(self.who, 1, 0)
         u = circumstances.can_move_creature(self.who, 0, -1)
@@ -49,12 +49,12 @@ class idiotic_seeker_AI(AI):
     def act(self, circumstances, Time):
         self.stuck = False
         Time.after(self.who.get_stat('SPD'), lambda:self.act(circumstances, Time))
-        x, y = circumstances.where_is(self.who)
+        x, y = self.who.position
         l = circumstances.can_move_creature(self.who, -1, 0)
         r = circumstances.can_move_creature(self.who, 1, 0)
         u = circumstances.can_move_creature(self.who, 0, -1)
         d = circumstances.can_move_creature(self.who, 0, 1)
-        hx, hy = circumstances.where_is(circumstances.get_hero())
+        hx, hy = circumstances.get_hero().position
         dx, dy = hx - x, hy - y
         if dx > 0 and r:
             circumstances.move_creature(self.who, 1, 0)
@@ -77,8 +77,8 @@ class seeker_AI(AI):
     def act(self, circumstances, Time):
         self.stuck = False
         h = circumstances.get_hero()
-        hx, hy = circumstances.where_is(h)
-        x, y = circumstances.where_is(self.who)
+        hx, hy = h.position
+        x, y = self.who.position
         if circumstances.visible_by(self.who, hx, hy):
             self.memorize(0, (hx, hy))
             self.memorize(1,(hx - x, hy - y))
