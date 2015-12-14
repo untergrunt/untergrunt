@@ -1,7 +1,7 @@
 1 red dd 00 00
 2 green 00 b0 40
-3 blue 00 00 ff
-4 white dd dd dd
+3 blue 00 00 dd
+4 white b8 b8 b8
 5 black 00 00 00
 6 yellow dd dd 00
 7 brown aa 77 00

@@ -23,6 +23,9 @@ class BigMap:
         self.h = h
         self.__ready = False
         self.__creatures = {}
+        self.ambient_light = 0
+        self.lightmap = [[self.ambient_light]*w for i in range(h)]
+        self.sources = None
     def generate(self):
         generators = {
             'dungeon': BigMap.generate_dungeon,
@@ -124,11 +127,27 @@ class BigMap:
             yl = 0
             #xg = xl + x0 - d_max
             #yg = yl + x0 - d_max
+    def calculate_light(self):
+        creatures = [Creature.by_id(c) for c in self.__creatures]
+        sources = set((self.where_is(c), c.light) for c in creatures if c.light > 0)
+        if sources != self.sources:
+            self.lightmap = [[self.ambient_light]*self.w for i in range(self.h)]
+            for c in creatures:
+                z = c
+                if z:
+                    zx, zy = self.where_is(z)
+                    if z.light > 0:
+                        d = int((z.light - 1)**0.5)
+                        for lx in range(max(0,zx-d), min(self.w,zx+d+1)):
+                            for ly in range(max(0,zy-d), min(self.h,zy+d+1)):
+                                self.lightmap[ly][lx] += int(z.light / (((zx-lx)**2+(zy-ly)**2)+1))
+        self.sources = sources
                 
                     
-    def visible_by(self, c, x, y, lt):
+    def visible_by(self, c, x, y):
             x0, y0 = self.where_is(c)
-            d_max = round(c.vision * (lt/100) ** 0.5)
+            lt = self.lightmap[y][x]
+            d_max = min(c.vision, round(c.vision * (lt/100) ** 0.5))
             if (x-x0)**2 + (y-y0)**2 > d_max**2:
                 return False
             if x == x0:

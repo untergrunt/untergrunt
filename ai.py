@@ -1,5 +1,6 @@
 from random import choice
 from tweaks import log
+from graphics import MessageBox as MSG
 
 class Mind:
     def __init__(self):
@@ -78,10 +79,13 @@ class seeker_AI(AI):
         h = circumstances.get_hero()
         hx, hy = circumstances.where_is(h)
         x, y = circumstances.where_is(self.who)
-        if circumstances.visible_by(self.who, hx, hy, circumstances.m[hy][hx].light):
+        if circumstances.visible_by(self.who, hx, hy):
             self.memorize(0, (hx, hy))
             self.memorize(1,(hx - x, hy - y))
             self.memorize(2, 20)
+            if self.who.light == 10000:
+                self.who.light = 5
+                MSG.pop('You hear someone whisper: "W-h-h-e s-s-see the hobbitses-s-s..."')
         elif self.knows(0):
             hx, hy = self.recall(0)
             if (hx, hy) == (x, y):
@@ -93,6 +97,9 @@ class seeker_AI(AI):
             hy += y
         else:
             hx, hy = x, y
+            if self.who.light != 10000:
+                self.who.light = 10000
+                MSG.pop('You see a flash of light')
         Time.after(self.who.get_stat('SPD'), lambda:self.act(circumstances, Time))
         l = circumstances.can_move_creature(self.who, -1, 0)
         r = circumstances.can_move_creature(self.who, 1, 0)
