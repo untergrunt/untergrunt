@@ -64,6 +64,7 @@ class Creature:
     def can_pass_through(self, cell):
         if cell.floor.name not in ['sand', 'stone', 'dirt']: return False
         if cell.fill.name not in ['air', 'void']: return False
+        if cell.statics != None and [True for i in cell.statics if not i.passible] != []: return False
         return True
     def by_id(ID):
         for i in Creature.__reg:

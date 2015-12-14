@@ -23,9 +23,10 @@ class BigMap:
         self.h = h
         self.__ready = False
         self.__creatures = {}
-        self.ambient_light = 0
+        self.ambient_light = 30
         self.lightmap = [[self.ambient_light]*w for i in range(h)]
         self.sources = None
+        self.statics = []
     def generate(self):
         generators = {
             'dungeon': BigMap.generate_dungeon,
@@ -33,7 +34,9 @@ class BigMap:
             'lenoblast': BigMap.generate_lenoblast,
             'plane': BigMap.generate_plane
         }
-        self.m = generators[self.alg](self.w, self.h)
+        mp = generators[self.alg](self.w, self.h)
+        self.m = mp[0]
+        self.statics = mp[1]
         self.__ready = True
     def ready(self):
         return self.__ready
@@ -47,7 +50,13 @@ class BigMap:
                 for k in range(100,w-100):
                     bm[(h-1)//25 * i + 5][k] = Cell('stone','air')
                     bm[k][(w-1)//25 * i + 5] = Cell('stone','air')
-        return bm
+        stats = [Static('door', i[0], i[1]) for i in [(507, 473), (468,473), (473, 468), (473, 507)]]
+        for s in stats:
+            if bm[s.y][s.x].statics == None:
+                bm[s.y][s.x].statics = [s]
+            else:
+                bm[s.y][s.x].statics.append(s)
+        return [bm, stats]
     def generate_village(w, h): #TODO
         pass
     def generate_lenoblast(w, h): #TODO
@@ -130,8 +139,14 @@ class BigMap:
     def calculate_light(self):
         creatures = [Creature.by_id(c) for c in self.__creatures]
         sources = set((self.where_is(c), c.light) for c in creatures if c.light > 0)
+        statlight = set(i for i in self.statics if i.light not in [None, 0])
         if sources != self.sources:
             self.lightmap = [[self.ambient_light]*self.w for i in range(self.h)]
+            for s in statlight:
+                d = int((s.light - 1)**0.5)
+                for lx in range(max(0,s.x-d), min(self.w,s.x+d+1)):
+                    for ly in range(max(0,s.y-d), min(self.h,s.y+d+1)):
+                        self.lightmap[ly][lx] += int(s.light / (((s.x-lx)**2+(s.y-ly)**2)+1))
             for c in creatures:
                 z = c
                 if z:
@@ -154,13 +169,13 @@ class BigMap:
                 vis = True
                 y1, y2 = sorted((y, y0))
                 for k in range(y1+1,y2):
-                    vis &= self.m[k][x].fill.name == 'air'
+                    vis &= self.m[k][x].fill.name == 'air' and (self.m[k][x].statics == None or all(i.transparent for i in self.m[k][x].statics))
                 return vis
             elif y == y0:
                 vis = True
                 x1, x2 = sorted((x, x0))
                 for k in range(x1+1,x2):
-                    vis &= self.m[y][k].fill.name == 'air'
+                    vis &= self.m[y][k].fill.name == 'air' and (self.m[y][k].statics == None or all(i.transparent for i in self.m[y][k].statics))
                 return vis
             dy = abs(y0 - y)
             dx = abs(x0 - x)
@@ -172,19 +187,23 @@ class BigMap:
                 y1, y2 = sorted((y, y0))
                 for i in range(x1 + 1, x2 ):
                     yy = y1 + round((y2-y1)*(x2-i)/(x2-x1))
-                    vis1 &= self.m[yy][i].fill.name == 'air'
-                    vis2 &= self.m[yy+1][i].fill.name == 'air'
-                    vis3 &= self.m[yy-1][i].fill.name == 'air'
+                    vis1 &= self.m[yy][i].fill.name == 'air' and (self.m[yy][i].statics == None or all(i.transparent for i in self.m[yy][i].statics))
+                    vis2 &= self.m[yy+1][i].fill.name == 'air' and (self.m[yy+1][i].statics == None or all(i.transparent for i in self.m[yy+1][i].statics))
+                    vis3 &= self.m[yy-1][i].fill.name == 'air' and (self.m[yy-1][i].statics == None or all(i.transparent for i in self.m[yy-1][i].statics))
             else:
                 x1, x2 = sorted((x0, x))
                 y1, y2 = sorted((y, y0))
                 for i in range(y1 + 1, y2 ):
                     xx = x1 + round((x2-x1)*(y2-i)/(y2-y1))
-                    vis1 &= self.m[i][xx].fill.name == 'air'
-                    vis2 &= self.m[i][xx + 1].fill.name == 'air'
-                    vis3 &= self.m[i][xx - 1].fill.name == 'air'
+                    vis1 &= self.m[i][xx].fill.name == 'air' and (self.m[i][xx].statics == None or all(i.transparent for i in self.m[i][xx].statics))
+                    vis2 &= self.m[i][xx + 1].fill.name == 'air' and (self.m[i][xx + 1].statics == None or all(i.transparent for i in self.m[i][xx + 1].statics))
+                    vis3 &= self.m[i][xx - 1].fill.name == 'air' and (self.m[i][xx-1].statics == None or all(i.transparent for i in self.m[i][xx -1].statics))
             return vis1 and (vis2 or vis3)
-'''    def visible_by(self, c, x, y):
+    def add_static(self, static, x, y):
+        static.x = x
+        static.y = y
+        self.statics.append(static)
+    '''def visible_by(self, c, x, y):
             x_s, y_s = x, y
             x0, y0 = self.where_is(c)
             x0, x = sorted((x0, x)) #x0 <= x

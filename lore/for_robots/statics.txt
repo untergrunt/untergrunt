@@ -1,0 +1,20 @@
+#This is a campfire
+CAMPFIRE:
+    not passible
+    light source : 100-200
+    symbol : *
+    color : red
+STAIRS_DOWN:
+    passible
+    symbol : >
+    color : blue
+STAIRS_UP:
+    passible
+    symbol : <
+    color : blue
+DOOR:
+    not passible
+    symbol : +
+    color : brown
+    blocks vision
+#    interaction : open

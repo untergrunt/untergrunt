@@ -50,7 +50,13 @@ class Camera: #Keeps track of the hero, tells what part of the field to show
                     if self.field.visible_by(self.actor, zx, zy):
                         charmap[zy - self.y][zx - self.x] = z.get_symbol()
                         colormap[zy - self.y][zx - self.x] = 'white'
-        x, y = self.field.where_is(self.actor)
+        for s in self.field.statics:
+            print(s)
+            if ((s.y - self.y) in range(height)) and ((s.x - self.x) in range(width)):
+                print(s.x, s.y, self.field.visible_by(self.actor, s.x, s.y))
+                if self.field.visible_by(self.actor, s.x, s.y):
+                    charmap[s.y - self.y][s.x - self.x] = s.symbol
+                    colormap[s.y - self.y][s.x - self.x] = s.color
         charmap[y - self.y][x - self.x] = self.actor.get_symbol()
         colormap[y - self.y][x - self.x] = 'green'
         return (charmap, colormap)
