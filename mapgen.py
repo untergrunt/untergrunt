@@ -22,7 +22,7 @@ class BigMap:
         self.w = w
         self.h = h
         self.__ready = False
-        self.__creatures = {}
+        self.__creatures = []
         self.ambient_light = 30
         self.lightmap = [[self.ambient_light]*w for i in range(h)]
         self.sources = None
@@ -50,7 +50,7 @@ class BigMap:
                 for k in range(100,w-100):
                     bm[(h-1)//25 * i + 5][k] = Cell('stone','air')
                     bm[k][(w-1)//25 * i + 5] = Cell('stone','air')
-        stats = [Static('door', i[0], i[1]) for i in [(507, 473), (468,473), (473, 468), (473, 507)]]
+        stats = [Static('closed_door', i[0], i[1]) for i in [(507, 473), (468,473), (473, 468), (473, 507)]]
         for s in stats:
             if bm[s.y][s.x].statics == None:
                 bm[s.y][s.x].statics = [s]
@@ -93,19 +93,15 @@ class BigMap:
             save_to_dir('save/'+fname+str(n))
     def add_creature(self, creature, x, y):
         if creature.id not in self.__creatures:
-            self.__creatures[creature.id] = (x, y)
-    def where_is(self, creature):
-        try:
-            return self.__creatures[creature.id]
-        except:
-            raise ValueError('Could not find such a creature -', creature.id)
+            self.__creatures.append(creature.id)
+        creature.position = (x,y)
     def knows(self, creature):
         return creature.id in self.__creatures
     def move_creature(self, creature, x, y):
         try:
-            x0, y0 = self.__creatures[creature.id]
+            x0, y0 = creature.where_is()
             if creature.can_pass_through(self.m[y0 + y][x0 + x]):
-                self.__creatures[creature.id] = (x0 + x, y0 + y)
+                creature.position = (x0 + x, y0 + y)
                 return True
             else:
                 return False
@@ -113,7 +109,7 @@ class BigMap:
             raise ValueError('Could not find such a creature')
     def can_move_creature(self, creature, x, y):
         try:
-            x0, y0 = self.__creatures[creature.id]
+            x0, y0 = creature.where_is()
             if creature.can_pass_through(self.m[y0 + y][x0 + x]):
                 return True
             else:
@@ -128,7 +124,7 @@ class BigMap:
                 return Creature.by_id(c)
         raise Exception('No hero found')
     def fov(self, c):
-        x0, y0 = self.where_is(c)
+        c.where_is()
         d_max = c.vision
         f = [[None]*(d_max*2) for i in range(2*d_max)]
         for i in range(2*d_max):
@@ -138,7 +134,7 @@ class BigMap:
             #yg = yl + x0 - d_max
     def calculate_light(self):
         creatures = [Creature.by_id(c) for c in self.__creatures]
-        sources = set((self.where_is(c), c.light) for c in creatures if c.light > 0)
+        sources = set((c.where_is(), c.light) for c in creatures if c.light > 0)
         statlight = set(i for i in self.statics if i.light not in [None, 0])
         if sources != self.sources:
             self.lightmap = [[self.ambient_light]*self.w for i in range(self.h)]
@@ -150,7 +146,7 @@ class BigMap:
             for c in creatures:
                 z = c
                 if z:
-                    zx, zy = self.where_is(z)
+                    zx, zy = z.where_is()
                     if z.light > 0:
                         d = int((z.light - 1)**0.5)
                         for lx in range(max(0,zx-d), min(self.w,zx+d+1)):
@@ -160,7 +156,7 @@ class BigMap:
                 
                     
     def visible_by(self, c, x, y):
-            x0, y0 = self.where_is(c)
+            x0, y0 = c.where_is()
             lt = self.lightmap[y][x]
             d_max = min(c.vision, round(c.vision * (lt/100) ** 0.5))
             if (x-x0)**2 + (y-y0)**2 > d_max**2:
@@ -205,7 +201,7 @@ class BigMap:
         self.statics.append(static)
     '''def visible_by(self, c, x, y):
             x_s, y_s = x, y
-            x0, y0 = self.where_is(c)
+            x0, y0 = c.where_is()
             x0, x = sorted((x0, x)) #x0 <= x
             y0, y = sorted((y0, y)) #y0 <= y
             d_max = round(c.vision * (self.m[y][x].light/100) ** 0.5)
@@ -242,7 +238,7 @@ class BigMap:
             return True'''
             
             
-            
+karte=BigMap('dungeon',1000,1000)        
             
     
     

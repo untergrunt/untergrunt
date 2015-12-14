@@ -12,9 +12,13 @@ STAIRS_UP:
     passible
     symbol : <
     color : blue
-DOOR:
+CLOSED_DOOR:
     not passible
     symbol : +
     color : brown
     blocks vision
+OPEN_DOOR:
+    passible
+    symbol : /
+    color : brown
 #    interaction : open

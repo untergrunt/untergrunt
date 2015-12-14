@@ -1,8 +1,10 @@
-from graphics import MessageBox as MSG
+import graphics
+MSG = graphics.MessageBox
 from hero import hero
 from creatures import Creature
 from tweaks import log
 from time import sleep
+from mapgen import karte
 #from ai import AI
 
 class Time:
@@ -80,6 +82,9 @@ def player_acts(command, field):
         t=Time.wait_until_event(next)
     else:
         Time.wait(t=field.get_hero().get_stat('SPD'))
+        
+
+    
             
     
         
@@ -96,8 +101,50 @@ def operate(command, field):
     elif command == 'right':
         if not field.move_creature(hero, 1, 0):
             MSG.pop('You can\'t walk there!')
-    elif  command == 'wait':
-        pass
+    elif command == 'wait':
+        passk=None
+    elif command == 'open door':
+        k= None
+        x, y = hero.position
+        while k not in [graphics.keys[i] for i in ('left', 'right', 'up', 'down')]:
+            k=graphics.stdscr.getch()
+        if k == graphics.keys['left']:
+            for s in karte.statics:
+                if (s.x, s.y) == (x-1, y):
+                    hero.open_door(s)
+        elif k == graphics.keys['right']:
+            for s in karte.statics:
+                if (s.x, s.y) == (x+1, y):
+                    hero.open_door(s)
+        elif k == graphics.keys['up']:
+            for s in karte.statics:
+                if (s.x, s.y) == (x, y-1):
+                    hero.open_door(s)
+        elif k == graphics.keys['down']:
+            for s in karte.statics:
+                if (s.x, s.y) == (x, y+1):
+                    hero.open_door(s)
+    elif command == 'close door':
+        k= None
+        x, y = hero.position
+        while k not in [graphics.keys[i] for i in ('left', 'right', 'up', 'down')]:
+            k=graphics.stdscr.getch()
+        if k == graphics.keys['left']:
+            for s in karte.statics:
+                if (s.x, s.y) == (x-1, y):
+                    hero.close_door(s)
+        elif k == graphics.keys['right']:
+            for s in karte.statics:
+                if (s.x, s.y) == (x+1, y):
+                    hero.close_door(s)
+        elif k == graphics.keys['up']:
+            for s in karte.statics:
+                if (s.x, s.y) == (x, y-1):
+                    hero.close_door(s)
+        elif k == graphics.keys['down']:
+            for s in karte.statics:
+                if (s.x, s.y) == (x, y+1):
+                    hero.close_door(s)
         
         
         

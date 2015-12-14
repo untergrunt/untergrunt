@@ -66,6 +66,17 @@ class Creature:
         if cell.fill.name not in ['air', 'void']: return False
         if cell.statics != None and [True for i in cell.statics if not i.passible] != []: return False
         return True
+    def where_is(self):
+        try:
+            return (self.x, self.y)
+        except:
+            return None
+    @property
+    def position(self):
+        return (self.x, self.y)
+    @position.setter
+    def position(self, p):
+        self.x, self.y = p
     def by_id(ID):
         for i in Creature.__reg:
             if i.id == ID:
@@ -75,6 +86,27 @@ class Creature:
             return self.stats.dic[stat]
         else:
             raise ValueError('No such stat -', stat)
+    # INTERACTIONS   
+    def open_door(self, d):
+        if d.kind != 'closed_door':
+            return False
+        if self.stats.dic['INT'] < 2:
+            return False
+        d.kind = 'open_door'
+        d.passible = True
+        d.symbol = '/'
+        d.transparent = True
+        return True
+    def close_door(self, d):
+        if d.kind != 'open_door':
+            return False
+        if self.stats.dic['INT'] < 2:
+            return False
+        d.kind = 'closed_door'
+        d.passible = False
+        d.symbol = '+'
+        d.transparent = False
+        return True
         
         
         

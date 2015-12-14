@@ -1,5 +1,4 @@
 import graphics
-import worldgen
 import field
 import camera
 from mechanics import player_acts
@@ -77,6 +76,7 @@ def load_world_creation_window():
     world_creation_window.ems[0].set_text_map(worldgen.map_to_strings(map))
     world_creation_window.ems[0].set_color_map(worldgen.map_to_colors(map))
     world_creation_window.get_focus()
+   
     
 def create_game_window():
     global karte
@@ -101,7 +101,7 @@ def create_game_window():
         game_window.get_focus()
         
     inventory_window = graphics.Window(0,0, width, height, title='Inventory', style='', back=return_back)
-    karte = camera.BigMap('dungeon',1000,1000)
+    karte = camera.karte
     locator = graphics.LabelElement(1,1,'(500, 500)')
     karte.add_creature(hero, 500, 500)
     big_brother = camera.Camera(dfview.w, dfview.h, karte, hero)
@@ -122,13 +122,15 @@ def create_game_window():
     cursor = graphics.CursorElement(0, 0, width-1, height-1, handler)
     
     def setup_dfview():
-        dfview.accepts_keys = [keys['down'], keys['up'], keys['left'], keys['right'], keys['.']]
+        dfview.accepts_keys = [keys['down'], keys['up'], keys['left'], keys['right'], keys['.'], keys['o'], keys['c']]
         dfview.actions = {
             keys['down']: lambda:let_the_player_act_and_pass_the_changes_to_the_dfview('down'),
             keys['up']: lambda:let_the_player_act_and_pass_the_changes_to_the_dfview('up'),
             keys['left']: lambda:let_the_player_act_and_pass_the_changes_to_the_dfview('left'),
             keys['right']: lambda:let_the_player_act_and_pass_the_changes_to_the_dfview('right'),
-            keys['.']: lambda:let_the_player_act_and_pass_the_changes_to_the_dfview('wait')
+            keys['.']: lambda:let_the_player_act_and_pass_the_changes_to_the_dfview('wait'),
+            keys['o']: lambda:let_the_player_act_and_pass_the_changes_to_the_dfview('open door'),
+            keys['c']: lambda:let_the_player_act_and_pass_the_changes_to_the_dfview('close door')
         }
         dfview.can_accept_focus = True
         
@@ -157,7 +159,7 @@ def load_game_window():
 def let_the_player_act_and_pass_the_changes_to_the_dfview(player_action):
     player_acts(player_action, karte)
     dfview.text_map, dfview.color_map = big_brother.get_screen()
-    locator.text = str(big_brother.field.where_is(hero))
+    locator.text = str(hero.where_is())
         
     
 

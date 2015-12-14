@@ -1,7 +1,7 @@
 
 from hero import *
 #from random import randint
-from mapgen import BigMap
+from mapgen import BigMap, karte
 from graphics import print, height, width
 from creatures import Creature
 from parse import read_tiles
@@ -14,11 +14,11 @@ class Camera: #Keeps track of the hero, tells what part of the field to show
         self.h = h
         self.field = field
         self.actor = actor
-        x, y = field.where_is(self.actor)
+        x, y = self.actor.where_is()
         self.x = x - self.w // 2 #starting position
         self.y = y - self.h // 2 #maybe plus, curse the curses
     def update(self):
-        x, y = self.field.where_is(self.actor)
+        x, y = self.actor.where_is()
         if self.x + self.w // 2 - x not in range(-40, 40):
             self.x = x - self.w // 2
         if self.y + self.h // 2 - y not in range(-10, 10):
@@ -41,11 +41,11 @@ class Camera: #Keeps track of the hero, tells what part of the field to show
                 return cell.fill.color
         charmap = [[symbol_on_point(x, y) for x in range(self.x, self.x + self.w)] for y in range(self.y, self.y + self.h)]
         colormap = [[color_on_cell(self.field.m[y][x]) for x in range(self.x, self.x + self.w)] for y in range(self.y, self.y + self.h)]
-        x, y = self.field.where_is(self.actor)
+        x, y = self.actor.where_is()
         for c in self.field.get_creatures():
             z = Creature.by_id(c)
             if z:
-                zx, zy = self.field.where_is(z)
+                zx, zy = z.where_is()
                 if ((zy - self.y) in range(height)) and ((zx - self.x) in range(width)):
                     if self.field.visible_by(self.actor, zx, zy):
                         charmap[zy - self.y][zx - self.x] = z.get_symbol()
