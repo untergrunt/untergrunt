@@ -239,6 +239,55 @@ class MessageBox(Window):
             prev_window = MessageBox.back
         A = MessageBox(msg, lambda: prev_window.get_focus())
         A.get_focus()
+     
+class YesNoBox(Window):
+    def __init__(self, text, back=None):
+        l = len(text)
+        maxlen = 80
+        if l < maxlen:
+            w = l + 10
+            h = 5
+        else:
+            w = maxlen + 10
+            n = l // maxlen
+            h = n + 5
+        self.w = max(w, 47)
+        self.h = h
+        kae = KeyAcceptorElement({keys['enter']: back})
+        self.x = (width - self.w) // 2
+        self.y = (height - self.h) // 2
+        self.ems = [kae]
+        self.focus_acceptors = [kae]
+        self.focused_element = kae
+        self.bold = False
+        self.noborder = False
+        self.visible = False
+        self.title = 'Answer the question!(Press <y>/<n> to answer)'
+        self.has_focus = False
+        if back != None:
+            self.back = back
+        self.red = True
+        kae.parent = self
+        if l < maxlen and '\n' not in text:
+            txt = LabelElement(5,2,text)
+        else:
+            self.h += text.count('\n')
+            txt = TextElement(5,2,maxlen,text)
+        self.add_element(txt)
+    def ask(msg, prev_window=None):
+        if prev_window == None:
+            prev_window = MessageBox.back
+        A = YesNoBox(msg, lambda: prev_window.get_focus())
+        A.get_focus()
+        Window.draw_windows()
+        win.refresh()
+        x = stdscr.getch()
+        while x not in [keys['y'], keys['n']]:
+            x = stdscr.getch()
+        A.back()
+        Window.draw_windows()
+        win.refresh()
+        return x == keys['y']
         
 class WindowElement:
     parent = None

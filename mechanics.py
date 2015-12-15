@@ -168,10 +168,16 @@ def operate(command, field):
                 flag = True                         
         if flag: 
             MSG.pop('You exterminate everyone')
-            MSG.pop('You exterminate everyone')
     elif command == 'blind self':
         for i in hero.body.parts:
             if i.name == 'eyes':
                 i.take_damage(60)
-                MSG.pop('You try to blind yourself')
+                MSG.pop('You blind yourself')
+    elif command == 'unblind self':
+        for i in hero.body.parts:
+            if i.name == 'eyes':
+                i.health += 40
+                if i.health in range(51,91):
+                    hero.effects.remove('blind')
+                MSG.pop('You heal your eyes')
         

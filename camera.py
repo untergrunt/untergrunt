@@ -25,6 +25,7 @@ class Camera: #Keeps track of the hero, tells what part of the field to show
             self.y = y - self.h // 2
     def get_screen(self): #returns a tuple of two 2d lists: charmap and colormap
         self.update()
+        self.field.calculate_light()
         if not self.actor.can('see'):
             charmap = [[' ' for x in range(self.x, self.x + self.w)] for y in range(self.y, self.y + self.h)]
             colormap = [['black' for x in range(self.x, self.x + self.w)] for y in range(self.y, self.y + self.h)]
@@ -32,7 +33,6 @@ class Camera: #Keeps track of the hero, tells what part of the field to show
             charmap[y - self.y][x - self.x] = self.actor.get_symbol()
             colormap[y - self.y][x - self.x] = 'green'
             return charmap, colormap
-        self.field.calculate_light()
         lightmap = self.field.lightmap
         def symbol_on_cell(cell):
             return str(cell)

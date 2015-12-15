@@ -133,7 +133,8 @@ def create_game_window():
             keys['c']: lambda:let_the_player_act_and_pass_the_changes_to_the_dfview('close door'),
             keys['Q']: lambda:let_the_player_act_and_pass_the_changes_to_the_dfview('commit suicide'),
             keys['E']: lambda:let_the_player_act_and_pass_the_changes_to_the_dfview('exterminate'),
-            keys['B']: lambda:let_the_player_act_and_pass_the_changes_to_the_dfview('blind self')
+            keys['B']: lambda:let_the_player_act_and_pass_the_changes_to_the_dfview('blind self'),
+            keys['H']: lambda:let_the_player_act_and_pass_the_changes_to_the_dfview('unblind self')
         }
         dfview.can_accept_focus = True
         

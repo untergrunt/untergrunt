@@ -84,6 +84,8 @@ class seeker_AI(AI):
         h = circumstances.get_hero()
         hx, hy = h.position
         x, y = self.who.position
+        if not self.who.can('see'):
+            MSG.pop(self.who.name+' cannot see!')
         if self.who.can('see') and circumstances.visible_by(self.who, hx, hy):
             self.memorize(0, (hx, hy))
             self.memorize(1,(hx - x, hy - y))
