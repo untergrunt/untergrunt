@@ -1,5 +1,6 @@
 from ai import *
 from tweaks import log
+from graphics import MessageBox as MSG
 
 class Stats:
     possible = []
@@ -47,31 +48,47 @@ class BodyPart:
         return BodyPart(self.name, self.size, self.functions)  #A fully healed copy
     def take_damage(self, dmg):
         assert(dmg >= 0)
-        self.health -= dmg
+        self.health -= min(dmg, self.health)
         log(self.name, 'takes', dmg, 'damage', f='log')
 
 heart = BodyPart('heart', '0.5', ['blood pressure'])
 brain = BodyPart('brain', '2', ['consciousness', 'perception', 'control'])
 skin = BodyPart('skin', '10', ['disease resistance', 'protection'])
+hand = BodyPart('hand', '5', ['manipulation'])
+eyes = BodyPart('eyes', '1', ['vision'])
 
 class Body:
     def __init__(self, parts, root, connect): #Connect is a list of tuples, each of them contains a pair of
-                                              #connected organs from root to skin (e.g. (brain, skull))
+                                              #connected organs from root to skin (e.g. ('brain', 'skull'))
+        for i in parts:
+            if i.name == root.name:
+                parts.remove(i)
         self.parts = [i.clone() for i in parts]
         self.root = root.clone()
+        self.parts.append(self.root)
         self.connect = connect #A crutch for cloning
-        for i in self.parts:
-            i.outside = []
-            i.inside = []
+        for i in range(len(self.parts)):
+            self.parts[i].outside = []
+            self.parts[i].inside = []
             for fro,to in connect:
-                if i.name == fro.name:
-                    i.outside.append(to)
-                elif i.name == to.name:
-                    i.inside.append(fro)
+                if self.parts[i].name == fro:
+                    for j in self.parts:
+                        if j.name == to:
+                            to = j
+                            break
+                    self.parts[i].outside.append(to)
+                elif self.parts[i].name == to:
+                    for j in self.parts:
+                        if j.name == fro:
+                            fro = j
+                            break
+                    self.parts[i].inside.append(fro)
+        for i in [j.outside for j in self.parts]:
+            pass
     def clone(self):
         return Body([i.clone() for i in self.parts], self.root.clone(), self.connect[:])
                 
-bdy = Body([heart, brain, skin], brain, [(brain, heart), (brain, skin), (heart, skin)])
+bdy = Body([heart, brain, skin, eyes], brain, [('brain', 'heart'), ('brain', 'skin'), ('heart', 'skin'), ('brain', 'eyes')])
 
 class Creature:
     symbol = None
@@ -94,7 +111,8 @@ class Creature:
         self.needs = set()
         self.body = body_template.clone()
         for p in self.body.parts:
-            self.needs.add(p)
+            for f in p.functions:
+                self.needs.add(f)
         self.race = race
         self.alive = True
         self.name = name
@@ -105,30 +123,44 @@ class Creature:
         self.vision = self.stats.dic['VSN']
         self.controlled_by_player = False
         self.light = 0
-        self.effects = []
+        self.effects = set()
         self.check_health()
+        log('init called',f='log')
     def check_health(self):
         functions = set()
+        log(self.body.parts, self.body.root.outside, f='log')
+        for j in self.body.parts:
+            if j.health <= 50:
+                for i in j.functions:
+                    if i == 'vision':
+                      self.effects.add('blind')
+                    elif i == 'consciousness':
+                       self.effects.add('unconscious')
+                    elif i == 'control':
+                       self.effects.add('unconscious')
         for p in self.body.parts:
-            if p.health <= 0:
+            if p.health <= 0:   
+                if len(p.inside) == 1 and p in p.inside[0].outside:
+                    p.inside[0].outside.remove(p)
+                log(self.name, p.name, 'is GONE, health is', p.health, f='log')
                 q = [p]
                 while q != []:
-                    exit()
                     curr, q = q[0], q[1:]
                     for i in curr.outside:
                         if i.inside == [curr] and i not in q:
                             q.append(i)
                     self.body.parts.remove(curr)
-                    if curr == self.root:
+                    if curr == self.body.root:
                         return False
             else:
                 log(self.name, p.name, 'is OK, health is', p.health, f='log')
         for p in self.body.parts:
-            functions.add(p)
+            for f in p.functions:
+                functions.add(f)
         if functions == self.needs:
             return True
         else:
-            self.effects = {}
+            self.effects = set()
             for i in self.needs - functions:
                 if i == 'vision':
                     self.effects.add('blind')
@@ -138,6 +170,7 @@ class Creature:
                     return False
                 elif i == 'blood pressure':
                     return False
+        return True
         
     def get_symbol(self):
         return self.symbol if self.symbol != None else self.race.symbol
@@ -148,7 +181,8 @@ class Creature:
         return True
     def die(self):
         self.AI = None
-#        self.controlled_by_player = False
+        if self.controlled_by_player:
+            MSG.pop('You die')
         self.alive = False
     def where_is(self):
         try:
@@ -191,6 +225,33 @@ class Creature:
         d.symbol = '+'
         d.transparent = False
         return True
+    def can(self, action):
+        manual_actions = 'open_door close_door grab'.split()
+        perception_actions = 'see hear smell'.split()
+        if action in manual_actions:
+            if 'manipulation' not in self.needs:
+                return False
+            for p in self.body.parts:
+                if 'manupulation' in p.functions:
+                    return True
+            return False
+        if action in perception_actions:
+            flag = False
+            if 'perception' not in self.needs:
+                return False
+            if 'blind' in self.effects: return False
+            for p in self.body.parts:
+                if 'perception' in p.functions:
+                    flag = True
+            if not flag: return False
+            if 'vision' not in self.needs:
+                return False
+            for p in self.body.parts:
+                if 'vision' in p.functions:
+                    return True
+            return False
+            
+        
         
         
         

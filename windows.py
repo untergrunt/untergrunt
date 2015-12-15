@@ -113,7 +113,8 @@ def create_game_window():
         cell=karte.m[g_y][g_x]
         for k in cre:
             if big_brother.to_local(k.position) == (x, y):
-                s += ['Here you see a {} standing on {} surrounded by {}'.format(k.race.name, cell.floor.name, cell.fill.name)]
+                s += ['Here you see a {}{} standing on {} surrounded by {}'.format(('' if k.alive else 'dead '), k.race.name, cell.floor.name, cell.fill.name)]
+                s += [p.name + ': ' + str(p.health) for p in k.body.parts]
         s = '\n'.join(s)
         if s == '':
             s = 'The floor is {}, the fill is {}'.format(cell.floor.name, cell.fill.name)
@@ -122,7 +123,6 @@ def create_game_window():
     cursor = graphics.CursorElement(0, 0, width-1, height-1, handler)
     
     def setup_dfview():
-        dfview.accepts_keys = [keys['down'], keys['up'], keys['left'], keys['right'], keys['.'], keys['o'], keys['c'], keys['d']]
         dfview.actions = {
             keys['down']: lambda:let_the_player_act_and_pass_the_changes_to_the_dfview('down'),
             keys['up']: lambda:let_the_player_act_and_pass_the_changes_to_the_dfview('up'),
@@ -131,7 +131,9 @@ def create_game_window():
             keys['.']: lambda:let_the_player_act_and_pass_the_changes_to_the_dfview('wait'),
             keys['o']: lambda:let_the_player_act_and_pass_the_changes_to_the_dfview('open door'),
             keys['c']: lambda:let_the_player_act_and_pass_the_changes_to_the_dfview('close door'),
-            keys['d']: lambda:let_the_player_act_and_pass_the_changes_to_the_dfview('commit suicide')
+            keys['Q']: lambda:let_the_player_act_and_pass_the_changes_to_the_dfview('commit suicide'),
+            keys['E']: lambda:let_the_player_act_and_pass_the_changes_to_the_dfview('exterminate'),
+            keys['B']: lambda:let_the_player_act_and_pass_the_changes_to_the_dfview('blind self')
         }
         dfview.can_accept_focus = True
         

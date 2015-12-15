@@ -4,6 +4,7 @@ import parse
 keys = {'down':258, 'up':259, 'left':260, 'right':261, 'enter': 10, 'esc': 263, 'i':105, 'k': 11, '.': 46} #27 - esc, 263 - backspace
 for i in range(97, 123):
     keys[chr(i)] = i
+    keys[chr(i-32)] = i-32
 
 table_symbols = {'-': '─', '|': '│', 'ul': '┌', 'll': '└', 'ur': '┐', 'lr': '┘'}
 
@@ -367,8 +368,9 @@ class VerticalMenuElement(WindowElement):
     
 class DfViewElement(WindowElement):
     def can_accept_event(self, event):
-        if 'accepts_keys' in dir(self) and event in self.accepts_keys: return True
-        return False
+        return 'actions' in dir(self) and event in self.actions
+        #if 'accepts_keys' in dir(self) and event in self.accepts_keys: return True
+        #return False
     def accept_event(self, event):
         self.actions[event]()
     def __init__(self, x, y, w, h):

@@ -11,8 +11,13 @@ class AI:
     def __init__(self, identity):
         self.who = identity
         self.mind = Mind()
-    def act(self, circumstances):
+    def ACT(self, circumstances, Time):
         pass
+    def act(self, circumstances, Time):
+        if self.who.alive:
+            self.ACT(circumstances, Time)
+        else:
+            pass
     def memorize(self, slot, info):
         self.mind.memory[slot] = info
     def forget(self, slot):
@@ -28,7 +33,7 @@ class AI:
            
            
 class idiot_AI(AI):
-    def act(self, circumstances, Time):
+    def ACT(self, circumstances, Time):
         self.stuck = False
         Time.after(self.who.get_stat('SPD'), lambda:self.act(circumstances, Time))
         x, y = self.who.position
@@ -46,7 +51,7 @@ class idiot_AI(AI):
             circumstances.move_creature(self.who, -1, 0)
             
 class idiotic_seeker_AI(AI):
-    def act(self, circumstances, Time):
+    def ACT(self, circumstances, Time):
         self.stuck = False
         Time.after(self.who.get_stat('SPD'), lambda:self.act(circumstances, Time))
         x, y = self.who.position
@@ -66,7 +71,7 @@ class idiotic_seeker_AI(AI):
             circumstances.move_creature(self.who, 0, -1)
             
 class random_AI(AI):
-    def act(self, circumstances, Time):
+    def ACT(self, circumstances, Time):
         x, y = choice(((0,1),(1,0),(0,-1),(-1,0)))
         circumstances.move_creature(self.who, x, y)
         log(self.who.get_stat('SPD'))
@@ -74,12 +79,12 @@ class random_AI(AI):
         Time.after(self.who.get_stat('SPD'), lambda:self.act(circumstances, Time))
         
 class seeker_AI(AI):
-    def act(self, circumstances, Time):
+    def ACT(self, circumstances, Time):
         self.stuck = False
         h = circumstances.get_hero()
         hx, hy = h.position
         x, y = self.who.position
-        if circumstances.visible_by(self.who, hx, hy):
+        if self.who.can('see') and circumstances.visible_by(self.who, hx, hy):
             self.memorize(0, (hx, hy))
             self.memorize(1,(hx - x, hy - y))
             self.memorize(2, 20)

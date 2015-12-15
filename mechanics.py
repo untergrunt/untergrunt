@@ -14,6 +14,9 @@ class Time:
     ids = []
     __curr_id = 0
     def after(time, action):
+        for c in karte.get_creatures():
+            if c.alive and not c.check_health():
+                c.die()
         if Time.times == []:
             Time.times = [time+Time.now]
             Time.actions = [action]
@@ -35,6 +38,9 @@ class Time:
                 return Time.__curr_id
     def wait(t=100):
         log(Time.times)
+        for c in karte.get_creatures():
+            if c.alive and not c.check_health():
+                c.die()
         for i in range(t):
             Time.now += 1
             count = 0
@@ -47,11 +53,10 @@ class Time:
             Time.times = Time.times[count:]
             Time.actions = Time.actions[count:]
             Time.ids = Time.ids[count:]
-            for c in karte.get_creatures():
-                if not c.check_health():
-                    c.die()
-                    karte.remove_creature(c)
     def wait_until_next_event():
+        for c in karte.get_creatures():
+            if c.alive and not c.check_health():
+                c.die()
         if Time.times == []: return
         Time.now = Time.times[0]
         Time.actions[0]()
@@ -59,6 +64,9 @@ class Time:
         Time.actions = Time.actions[1:]
         Time.ids = Time.ids[1:]
     def wait_until_event(ev_id):
+        for c in karte.get_creatures():
+            if c.alive and not c.check_health():
+                c.die()
         if ev_id not in Time.ids: 
             log(Time.times, Time.ids, Time.actions)
             raise ValueError('No such event!')
@@ -72,10 +80,11 @@ class Time:
 def player_acts(command, field):
     if field.get_hero().AI == None:
         if hero.alive:
-            next = Time.after(field.get_hero().get_stat('SPD'), lambda:operate(command, field))
+            operate(command, field)
+            next = Time.after(field.get_hero().get_stat('SPD'), lambda:operate('wait', field))
         else:
             next = Time.after(field.get_hero().get_stat('SPD'), lambda:operate('wait', field))
-            MSG.pop('You are dead')
+            MSG.pop('You are too dead')
     else:
         next = None
     if field.get_hero().AI != None:
@@ -95,7 +104,6 @@ def player_acts(command, field):
 def operate(command, field):
     if command == 'commit suicide':
         hero.die()
-        MSG.pop('You have just died')
     elif command == 'down':
         if not field.move_creature(hero, 0, 1):
             MSG.pop('You can\'t walk there!')
@@ -152,6 +160,18 @@ def operate(command, field):
             for s in karte.statics:
                 if (s.x, s.y) == (x, y+1):
                     hero.close_door(s)
-        
-        
+    elif command == 'exterminate':
+        flag = False
+        for c in field.get_creatures():
+            if c != hero:
+                c.body.root.take_damage(100000)
+                flag = True                         
+        if flag: 
+            MSG.pop('You exterminate everyone')
+            MSG.pop('You exterminate everyone')
+    elif command == 'blind self':
+        for i in hero.body.parts:
+            if i.name == 'eyes':
+                i.take_damage(60)
+                MSG.pop('You try to blind yourself')
         

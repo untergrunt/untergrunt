@@ -7,7 +7,7 @@ hero.stats.dic['SPD'] = 9
 hero.controlled_by_player = True
 
 gob = Creature(goblin_race, 'Kek', bdy)
-gob.light = 0#100
+gob.light = 100
 
 hero.light = 100
 
