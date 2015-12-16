@@ -1,5 +1,8 @@
 import curses
 import parse
+from tweaks import log as LOG
+
+log = lambda *x: LOG(*x, f='logs/main.log')
 
 keys = {'down':258, 'up':259, 'left':260, 'right':261, 'enter': 10, 'esc': 263, 'i':105, 'k': 11, '.': 46} #27 - esc, 263 - backspace
 for i in range(97, 123):
@@ -9,16 +12,6 @@ for i in range(97, 123):
 table_symbols = {'-': '─', '|': '│', 'ul': '┌', 'll': '└', 'ur': '┐', 'lr': '┘'}
 
 #Delay of the main menu may be caused by the ESC key delay, using backspace instead for now
-
-def print(*args, end='\n'):
-    log = open('log.txt', 'a')
-    log.write(' '.join(str(i) for i in args) + end)
-    log.close()
-    
-def reset_log():
-    log = open('log.txt', 'w')
-    log.close()
-    pass
 
 def init_graphics():
     global stdscr, win, height, width, color_pairs
@@ -36,12 +29,12 @@ def init_graphics():
     cls = parse.read_colors()
     colors = [(i[0], i[1][1:]) for i in sorted(list(cls.items()), key=lambda x: x[1][0])]
     color_number = len(colors)
-    print(colors)
+    log(colors)
     cls = {}
     for i in range(color_number):
         curses.init_color(16+i, *colors[i][1])
         cls[colors[i][0]]=16+i
-    print(cls)
+    log(cls)
     color_pairs = {}
     for i in range(color_number):
         for j in range(color_number):
@@ -95,9 +88,9 @@ class Window:
                 accepted_flag  = True
         return accepted_flag
     def draw_windows():
-        print('new')
+        log('new')
         for window in Window.__register:
-            print(window.visible, window.name)
+            log(window.visible, window.name)
         for window in Window.__register:
             if window != Window.focused_window and window.visible:
                 window.draw()
@@ -307,7 +300,7 @@ class WindowElement:
         self.has_focus = True
         self.parent.pass_internal_focus(self)
     def reset(self):
-        print('Warning: reset method not implemented for', type(self))
+        log('Warning: reset method not implemented for', type(self))
         
 class LabelElement(WindowElement):
     def __init__(self, x, y, text, style=''): #x, y relative to the window, starting from 1 for windows with borders
@@ -376,7 +369,7 @@ class VerticalMenuElement(WindowElement):
         }): #Bindings is a list of tuples: [(text, command-function), ...]
         self.x, self.y = x, y
         self.cls = cls
-        print('===', cls)
+        log('===', cls)
         self.bindings = bindings
         assert(all('\n' not in i for i in bindings))
         self.can_accept_focus = True
@@ -443,7 +436,7 @@ class DfViewElement(WindowElement):
             self.color_map = color_map
     def draw(self):
         if self.text_map == None: return
-        #print(self.text_map)
+        #log(self.text_map)
         for x in range(self.w):
             for y in range(self.h):
                 win.addch(self.parent.y + self.y + y, self.parent.x + self.x + x, self.text_map[y][x], color_pairs[self.color_map[y][x]+'+'+bgcolor])

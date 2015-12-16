@@ -1,6 +1,8 @@
 from ai import *
-from tweaks import log
+from tweaks import log as LOG
 from graphics import MessageBox as MSG
+
+log = lambda *x: LOG(*x, f='logs/creatures.log')
 
 class Stats:
     possible = []
@@ -49,7 +51,7 @@ class BodyPart:
     def take_damage(self, dmg):
         assert(dmg >= 0)
         self.health -= min(dmg, self.health)
-        log(self.name, 'takes', dmg, 'damage', f='log')
+        log(self.name, 'takes', dmg, 'damage')
 
 heart = BodyPart('heart', '0.5', ['blood pressure'])
 brain = BodyPart('brain', '2', ['consciousness', 'perception', 'control'])
@@ -125,10 +127,10 @@ class Creature:
         self.light = 0
         self.effects = set()
         self.check_health()
-        log('init called',f='log')
+        log('init called')
     def check_health(self):
         functions = set()
-        log(self.body.parts, self.body.root.outside, f='log')
+        log(self.body.parts, self.body.root.outside)
         for j in self.body.parts:
             if j.health <= 50:
                 for i in j.functions:
@@ -142,7 +144,7 @@ class Creature:
             if p.health <= 0:   
                 if len(p.inside) == 1 and p in p.inside[0].outside:
                     p.inside[0].outside.remove(p)
-                log(self.name, p.name, 'is GONE, health is', p.health, f='log')
+                log(self.name, p.name, 'is GONE, health is', p.health)
                 q = [p]
                 while q != []:
                     curr, q = q[0], q[1:]
@@ -153,7 +155,7 @@ class Creature:
                     if curr == self.body.root:
                         return False
             else:
-                log(self.name, p.name, 'is OK, health is', p.health, f='log')
+                log(self.name, p.name, 'is OK, health is', p.health)
         for p in self.body.parts:
             for f in p.functions:
                 functions.add(f)

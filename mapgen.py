@@ -1,7 +1,9 @@
 from field import *
-from graphics import print
 from os import mkdir, listdir
 from creatures import Creature
+from tweaks import log as LOG
+
+log = lambda *x: LOG(*x, f='logs/mapgen.log')
 
 class BigMap:
     '''
@@ -240,7 +242,7 @@ class BigMap:
             return True'''
             
             
-karte=BigMap('dungeon',1000,1000)        
+Map=BigMap('dungeon',1000,1000)        
             
     
     

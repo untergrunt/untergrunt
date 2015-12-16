@@ -1,6 +1,8 @@
+#This file is Orthodox
 from random import choice
 from tweaks import log as LOG
 from graphics import MessageBox as MSG
+
 log = lambda *x: LOG(*x, f='logs/ai.log')
 
 class Mind:

@@ -1,3 +1,5 @@
+from os import system
+
 logging = True
 
 def read_file(fname):
@@ -11,3 +13,6 @@ def log(*args, f='log.txt'):
         logfile = open(f, 'a')
         logfile.write(' '.join(str(i) for i in args) + '\n')
         logfile.close()
+        
+def reset_logs():
+    system('cd logs && rm -rf * && cd ..')

@@ -1,9 +1,10 @@
 import windows
 from windows import graphics
+import tweaks
 
-print = windows.print
+log = lambda *x: tweaks.log(*x, f='main.log')
 
-graphics.reset_log()
+tweaks.reset_logs()
 
 graphics.init_graphics()
 windows.load_main_window()

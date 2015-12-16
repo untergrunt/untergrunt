@@ -1,0 +1,115 @@
+[('red', (866, 0, 0)), ('green', (0, 690, 250)), ('blue', (0, 0, 866)), ('white', (721, 721, 721)), ('black', (0, 0, 0)), ('yellow', (866, 866, 0)), ('brown', (666, 466, 0)), ('light_gray', (501, 501, 501)), ('gray', (250, 250, 250)), ('dark_gray', (125, 125, 125))]
+{'blue': 18, 'gray': 24, 'black': 20, 'light_gray': 23, 'red': 16, 'dark_gray': 25, 'yellow': 21, 'brown': 22, 'green': 17, 'white': 19}
+Warning: reset method not implemented for <class 'graphics.LabelElement'>
+new
+True None
+False None
+False None
+False None
+False None
+Warning: reset method not implemented for <class 'graphics.KeyAcceptorElement'>
+Warning: reset method not implemented for <class 'graphics.DfViewElement'>
+Warning: reset method not implemented for <class 'graphics.LabelElement'>
+Warning: reset method not implemented for <class 'graphics.CursorElement'>
+new
+False None
+True None
+False None
+False None
+False None
+new
+False None
+True None
+False None
+False None
+False None
+new
+False None
+True None
+False None
+False None
+False None
+new
+False None
+True None
+False None
+False None
+False None
+new
+False None
+True None
+False None
+False None
+False None
+new
+False None
+True None
+False None
+False None
+False None
+new
+False None
+True None
+False None
+False None
+False None
+new
+False None
+True None
+False None
+False None
+False None
+new
+False None
+True None
+False None
+False None
+False None
+new
+False None
+True None
+False None
+False None
+False None
+new
+False None
+True None
+False None
+False None
+False None
+new
+False None
+True None
+False None
+False None
+False None
+new
+False None
+True None
+False None
+False None
+False None
+new
+False None
+True None
+False None
+False None
+False None
+new
+False None
+True None
+False None
+False None
+False None
+new
+False None
+True None
+False None
+False None
+False None
+new
+False None
+True None
+False None
+False None
+False None

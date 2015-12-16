@@ -4,15 +4,14 @@ import camera
 from mechanics import player_acts
 from creatures import Creature
 from hero import hero, gob
+from tweaks import log as LOG
+
+log = lambda *x: LOG(*x, f='logs/windows.log')
 
 ascii = camera.ascii
 
-print = graphics.print
-
 keys = graphics.keys
-
 MSG = graphics.MessageBox
-
 height, width = graphics.height, graphics.width
 
 current_stage = 'main window'
@@ -35,8 +34,8 @@ def create_main_window():
     title_text = graphics.LabelElement(width//2-7, 5,'THE ROGUELIKE!','br')
     buttons = [
         ('New game', lambda: change_stage('game')),
-        ('Create new world', lambda: print('Disabled')),
-        ('Load game', lambda: print('New game loaded')),
+        ('Create new world', lambda: log('Disabled')),
+        ('Load game', lambda: log('New game loaded')),
         ('Show credits', lambda: change_stage('credits')),
         ('Quit', graphics.die)
     ]
@@ -72,14 +71,14 @@ def load_world_creation_window():
     world_creation_window.reset()
     worldgen.generate()
     worldgen.export()
-    map=worldgen.load_map(charnum=32)
-    world_creation_window.ems[0].set_text_map(worldgen.map_to_strings(map))
-    world_creation_window.ems[0].set_color_map(worldgen.map_to_colors(map))
+    worldmap=worldgen.load_map(charnum=32)
+    world_creation_window.ems[0].set_text_map(worldgen.map_to_strings(worldmap))
+    world_creation_window.ems[0].set_color_map(worldgen.map_to_colors(worldmap))
     world_creation_window.get_focus()
    
     
 def create_game_window():
-    global karte
+    global Map
     global big_brother
     global locator
     global dfview
@@ -101,18 +100,18 @@ def create_game_window():
         game_window.get_focus()
         
     inventory_window = graphics.Window(0,0, width, height, title='Inventory', style='', back=return_back)
-    karte = camera.karte
+    Map = camera.Map
     locator = graphics.LabelElement(1,1,'(500, 500)')
-    karte.add_creature(hero, 500, 500)
-    big_brother = camera.Camera(dfview.w, dfview.h, karte, hero)
+    Map.add_creature(hero, 500, 500)
+    big_brother = camera.Camera(dfview.w, dfview.h, Map, hero)
     def handler(self, x, y):
         g_x, g_y = big_brother.to_global((x, y))
-        if not karte.visible_by(hero, g_x, g_y):
+        if not Map.visible_by(hero, g_x, g_y):
             MSG.pop('You cannot see anything here')
             return
-        cre = karte.get_creatures()
+        cre = Map.get_creatures()
         s=[]
-        cell=karte.m[g_y][g_x]
+        cell=Map.m[g_y][g_x]
         for k in cre:
             if big_brother.to_local(k.position) == (x, y):
                 s += ['Here you see a {}{} standing on {} surrounded by {}'.format(('' if k.alive else 'dead '), k.race.name, cell.floor.name, cell.fill.name)]
@@ -146,12 +145,12 @@ def create_game_window():
     game_window.add_element(cursor)
     
 def load_game_window():
-    global karte, info, big_brother
+    global Map, info, big_brother
     '''Map initialization'''
-    karte.generate()
-    karte.add_creature(hero, 500, 500)
-    karte.add_creature(gob, 505, 504)
-    karte.hero = hero
+    Map.generate()
+    Map.add_creature(hero, 500, 500)
+    Map.add_creature(gob, 505, 504)
+    Map.hero = hero
     '''End map initializasion '''
     game_window.reset()
     game_window.get_focus()
@@ -159,7 +158,7 @@ def load_game_window():
     
     
 def let_the_player_act_and_pass_the_changes_to_the_dfview(player_action):
-    player_acts(player_action, karte)
+    player_acts(player_action, Map)
     dfview.text_map, dfview.color_map = big_brother.get_screen()
     locator.text = str(hero.where_is())
         

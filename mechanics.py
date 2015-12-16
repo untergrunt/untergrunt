@@ -2,10 +2,11 @@ import graphics
 MSG = graphics.MessageBox
 from hero import hero
 from creatures import Creature
-from tweaks import log
+from tweaks import log as LOG
 from time import sleep
-from mapgen import karte
-#from ai import AI
+from mapgen import Map
+
+log = lambda *x: LOG(*x, f='logs/mechanics.log')
 
 class Time:
     now = 0
@@ -14,7 +15,7 @@ class Time:
     ids = []
     __curr_id = 0
     def after(time, action):
-        for c in karte.get_creatures():
+        for c in Map.get_creatures():
             if c.alive and not c.check_health():
                 c.die()
         if Time.times == []:
@@ -38,7 +39,7 @@ class Time:
                 return Time.__curr_id
     def wait(t=100):
         log(Time.times)
-        for c in karte.get_creatures():
+        for c in Map.get_creatures():
             if c.alive and not c.check_health():
                 c.die()
         for i in range(t):
@@ -54,7 +55,7 @@ class Time:
             Time.actions = Time.actions[count:]
             Time.ids = Time.ids[count:]
     def wait_until_next_event():
-        for c in karte.get_creatures():
+        for c in Map.get_creatures():
             if c.alive and not c.check_health():
                 c.die()
         if Time.times == []: return
@@ -64,7 +65,7 @@ class Time:
         Time.actions = Time.actions[1:]
         Time.ids = Time.ids[1:]
     def wait_until_event(ev_id):
-        for c in karte.get_creatures():
+        for c in Map.get_creatures():
             if c.alive and not c.check_health():
                 c.die()
         if ev_id not in Time.ids: 
@@ -124,19 +125,19 @@ def operate(command, field):
         while k not in [graphics.keys[i] for i in ('left', 'right', 'up', 'down')]:
             k=graphics.stdscr.getch()
         if k == graphics.keys['left']:
-            for s in karte.statics:
+            for s in Map.statics:
                 if (s.x, s.y) == (x-1, y):
                     hero.open_door(s)
         elif k == graphics.keys['right']:
-            for s in karte.statics:
+            for s in Map.statics:
                 if (s.x, s.y) == (x+1, y):
                     hero.open_door(s)
         elif k == graphics.keys['up']:
-            for s in karte.statics:
+            for s in Map.statics:
                 if (s.x, s.y) == (x, y-1):
                     hero.open_door(s)
         elif k == graphics.keys['down']:
-            for s in karte.statics:
+            for s in Map.statics:
                 if (s.x, s.y) == (x, y+1):
                     hero.open_door(s)
     elif command == 'close door':
@@ -145,19 +146,19 @@ def operate(command, field):
         while k not in [graphics.keys[i] for i in ('left', 'right', 'up', 'down')]:
             k=graphics.stdscr.getch()
         if k == graphics.keys['left']:
-            for s in karte.statics:
+            for s in Map.statics:
                 if (s.x, s.y) == (x-1, y):
                     hero.close_door(s)
         elif k == graphics.keys['right']:
-            for s in karte.statics:
+            for s in Map.statics:
                 if (s.x, s.y) == (x+1, y):
                     hero.close_door(s)
         elif k == graphics.keys['up']:
-            for s in karte.statics:
+            for s in Map.statics:
                 if (s.x, s.y) == (x, y-1):
                     hero.close_door(s)
         elif k == graphics.keys['down']:
-            for s in karte.statics:
+            for s in Map.statics:
                 if (s.x, s.y) == (x, y+1):
                     hero.close_door(s)
     elif command == 'attack':

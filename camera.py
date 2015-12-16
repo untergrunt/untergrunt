@@ -1,11 +1,14 @@
 
 from hero import *
 #from random import randint
-from mapgen import BigMap, karte
-from graphics import print, height, width
+from mapgen import BigMap, Map
+from graphics import height, width
 from creatures import Creature
 from parse import read_tiles
+from tweaks import log as LOG
+
 ascii = read_tiles()
+log = lambda *x: LOG(*x, f='logs/camera.log')
 
 class Camera: #Keeps track of the hero, tells what part of the field to show
     def __init__(self, w, h, field, actor): #Field is a BigMap object
@@ -57,9 +60,9 @@ class Camera: #Keeps track of the hero, tells what part of the field to show
                         charmap[zy - self.y][zx - self.x] = z.get_symbol()
                         colormap[zy - self.y][zx - self.x] = 'white'
         for s in self.field.statics:
-            print(s)
+            log(s)
             if ((s.y - self.y) in range(height)) and ((s.x - self.x) in range(width)):
-                print(s.x, s.y, self.field.visible_by(self.actor, s.x, s.y))
+                log(s.x, s.y, self.field.visible_by(self.actor, s.x, s.y))
                 if self.field.visible_by(self.actor, s.x, s.y):
                     charmap[s.y - self.y][s.x - self.x] = s.symbol
                     colormap[s.y - self.y][s.x - self.x] = s.color
