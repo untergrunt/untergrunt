@@ -98,6 +98,7 @@ class Creature:
         for i in Creature.__reg:
             if i.name == name:
                 raise ValueError()
+        self.name = name
         if stats == None:
             stats = race.stats
         if ai == None:
@@ -115,7 +116,6 @@ class Creature:
                 self.needs.add(f)
         self.race = race
         self.alive = True
-        self.name = name
         Creature.__max_id += 1
         self.id = Creature.__max_id
         Creature.__reg.append(self)
