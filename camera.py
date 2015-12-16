@@ -19,9 +19,9 @@ class Camera: #Keeps track of the hero, tells what part of the field to show
         self.y = y - self.h // 2 #maybe plus, curse the curses
     def update(self):
         x, y = self.actor.where_is()
-        if self.x + self.w // 2 - x not in range(-40, 40):
+        if self.x + self.w // 2 - x not in range(-width//3, width//3):
             self.x = x - self.w // 2
-        if self.y + self.h // 2 - y not in range(-10, 10):
+        if self.y + self.h // 2 - y not in range(-height//3, height//3):
             self.y = y - self.h // 2
     def get_screen(self): #returns a tuple of two 2d lists: charmap and colormap
         self.update()

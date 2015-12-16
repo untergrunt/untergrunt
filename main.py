@@ -14,8 +14,7 @@ keys = graphics.keys
 
 def event_manager(event):
     if event == 113:
-        if graphics.YesNoBox.ask('Are you sure you want to quit?') and graphics.YesNoBox.ask('Are you absolutely sure you want to quit?'):
-            return False
+        return False
     else:
         graphics.Window.get_event(event)
         graphics.Window.draw_windows()

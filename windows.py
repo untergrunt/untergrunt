@@ -106,9 +106,11 @@ def create_game_window():
     karte.add_creature(hero, 500, 500)
     big_brother = camera.Camera(dfview.w, dfview.h, karte, hero)
     def handler(self, x, y):
-        cre = karte.get_creatures()
         g_x, g_y = big_brother.to_global((x, y))
-        #s = ['floor: {}\nfill: {}\ncoords: ({}, {})'.format(karte.m[g_y][g_x].floor.name, karte.m[g_y][g_x].fill.name, g_x, g_y)]
+        if not karte.visible_by(hero, g_x, g_y):
+            MSG.pop('You cannot see anything here')
+            return
+        cre = karte.get_creatures()
         s=[]
         cell=karte.m[g_y][g_x]
         for k in cre:
@@ -124,17 +126,15 @@ def create_game_window():
     
     def setup_dfview():
         dfview.actions = {
-            keys['down']: lambda:let_the_player_act_and_pass_the_changes_to_the_dfview('down'),
-            keys['up']: lambda:let_the_player_act_and_pass_the_changes_to_the_dfview('up'),
-            keys['left']: lambda:let_the_player_act_and_pass_the_changes_to_the_dfview('left'),
+            keys['down']:  lambda:let_the_player_act_and_pass_the_changes_to_the_dfview('down'),
+            keys['up']:    lambda:let_the_player_act_and_pass_the_changes_to_the_dfview('up'),
+            keys['left']:  lambda:let_the_player_act_and_pass_the_changes_to_the_dfview('left'),
             keys['right']: lambda:let_the_player_act_and_pass_the_changes_to_the_dfview('right'),
-            keys['.']: lambda:let_the_player_act_and_pass_the_changes_to_the_dfview('wait'),
-            keys['o']: lambda:let_the_player_act_and_pass_the_changes_to_the_dfview('open door'),
-            keys['c']: lambda:let_the_player_act_and_pass_the_changes_to_the_dfview('close door'),
-            keys['Q']: lambda:let_the_player_act_and_pass_the_changes_to_the_dfview('commit suicide'),
-            keys['E']: lambda:let_the_player_act_and_pass_the_changes_to_the_dfview('exterminate'),
-            keys['B']: lambda:let_the_player_act_and_pass_the_changes_to_the_dfview('blind self'),
-            keys['H']: lambda:let_the_player_act_and_pass_the_changes_to_the_dfview('unblind self')
+            keys['.']:     lambda:let_the_player_act_and_pass_the_changes_to_the_dfview('wait'),
+            keys['o']:     lambda:let_the_player_act_and_pass_the_changes_to_the_dfview('open door'),
+            keys['c']:     lambda:let_the_player_act_and_pass_the_changes_to_the_dfview('close door'),
+            keys['Q']:     lambda:let_the_player_act_and_pass_the_changes_to_the_dfview('commit suicide'),
+            keys['A']:     lambda:let_the_player_act_and_pass_the_changes_to_the_dfview('attack')
         }
         dfview.can_accept_focus = True
         

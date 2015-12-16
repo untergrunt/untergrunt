@@ -160,24 +160,18 @@ def operate(command, field):
             for s in karte.statics:
                 if (s.x, s.y) == (x, y+1):
                     hero.close_door(s)
-    elif command == 'exterminate':
-        flag = False
-        for c in field.get_creatures():
-            if c != hero:
-                c.body.root.take_damage(100000)
-                flag = True                         
-        if flag: 
-            MSG.pop('You exterminate everyone')
-    elif command == 'blind self':
-        for i in hero.body.parts:
-            if i.name == 'eyes':
-                i.take_damage(60)
-                MSG.pop('You blind yourself')
-    elif command == 'unblind self':
-        for i in hero.body.parts:
-            if i.name == 'eyes':
-                i.health += 40
-                if i.health in range(51,91):
-                    hero.effects.remove('blind')
-                MSG.pop('You heal your eyes')
+    elif command == 'attack':
+        k= None
+        x, y = hero.position
+        while k not in [graphics.keys[i] for i in ('left', 'right', 'up', 'down')]:
+            k=graphics.stdscr.getch()
+        
+        if k == graphics.keys['left']:
+            pass
+        elif k == graphics.keys['right']:
+            pass
+        elif k == graphics.keys['up']:
+            pass
+        elif k == graphics.keys['down']:
+            pass
         

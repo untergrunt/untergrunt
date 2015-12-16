@@ -203,7 +203,7 @@ class Window:
 class MessageBox(Window):
     def __init__(self, text, back=None):
         l = len(text)
-        maxlen = 80
+        maxlen = width * 2 // 3
         if l < maxlen:
             w = l + 10
             h = 5
@@ -243,7 +243,7 @@ class MessageBox(Window):
 class YesNoBox(Window):
     def __init__(self, text, back=None):
         l = len(text)
-        maxlen = 80
+        maxlen = width * 2 // 3
         if l < maxlen:
             w = l + 10
             h = 5
