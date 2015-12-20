@@ -1,6 +1,4 @@
-
 from hero import *
-#from random import randint
 from mapgen import BigMap, Map
 from graphics import height, width
 from creatures import Creature
@@ -43,14 +41,17 @@ class Camera: #Keeps track of the hero, tells what part of the field to show
             if self.field.visible_by(self.actor, x, y):
                 return str(self.field.m[y][x])
             else:
-                return ' '
-        def color_on_cell(cell):
+                return ascii['unexplored']
+        def color_on_point(x, y):
+            cell = self.field.m[y][x]
+            if not self.field.visible_by(self.actor, x, y):
+                return 'black'
             if cell.fill.name in ['air', 'void']:
                 return cell.floor.color
             else:
                 return cell.fill.color
         charmap = [[symbol_on_point(x, y) for x in range(self.x, self.x + self.w)] for y in range(self.y, self.y + self.h)]
-        colormap = [[color_on_cell(self.field.m[y][x]) for x in range(self.x, self.x + self.w)] for y in range(self.y, self.y + self.h)]
+        colormap = [[color_on_point(x, y) for x in range(self.x, self.x + self.w)] for y in range(self.y, self.y + self.h)]
         x, y = self.actor.where_is()
         for z in self.field.get_creatures():
             if z:

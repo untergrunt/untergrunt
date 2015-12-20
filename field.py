@@ -1,6 +1,8 @@
 from materials import Material as mat
-from parse import read_statics
+from parse import read_statics, read_tiles
 from random import choice
+
+ascii = read_tiles()
 
 class Cell: #Stores data about one cell
     floor = mat.by_name('stone')
@@ -23,11 +25,11 @@ class Cell: #Stores data about one cell
         self.statics = None
     def __str__(self):
         if self.fill.name not in ['air', 'void']:
-            return '#'
+            return ascii['wall']
         elif self.floor.name == 'water':
-            return '~'
+            return ascii['water']
         else:
-            return '.'
+            return ascii['floor']
     def add_static(self, static):
         self.statics.append(static)
         

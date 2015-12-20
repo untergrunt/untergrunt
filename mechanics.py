@@ -1,5 +1,6 @@
 import graphics
 MSG = graphics.MessageBox
+ask = graphics.YesNoBox.ask
 from hero import hero
 from creatures import Creature
 from tweaks import log as LOG
@@ -104,7 +105,8 @@ def player_acts(command, field):
         
 def operate(command, field):
     if command == 'commit suicide':
-        hero.die()
+        if ask('Are you sure you want to commit suicide?'): #Perhaps it should be asked a little bit earlier
+            hero.die()
     elif command == 'down':
         if not field.move_creature(hero, 0, 1):
             MSG.pop('You can\'t walk there!')

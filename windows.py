@@ -8,8 +8,6 @@ from tweaks import log as LOG
 
 log = lambda *x: LOG(*x, f='logs/windows.log')
 
-ascii = camera.ascii
-
 keys = graphics.keys
 MSG = graphics.MessageBox
 height, width = graphics.height, graphics.width
