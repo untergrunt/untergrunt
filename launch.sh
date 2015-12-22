@@ -1,1 +1,1 @@
-gnome-terminal --full-screen -e "python3 main.py && exit"
+gnome-terminal --full-screen -e "bash start.sh && exit"

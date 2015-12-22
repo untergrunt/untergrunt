@@ -42,7 +42,7 @@ name:steel
 	boiling point:4000
 
 name:glass
-	color:white
+	color:green
 	density:1000
 	melting point:1000
 	boiling point:2000

@@ -18,6 +18,8 @@ class Material:
             raise ValueError('A material with name {} already exists'.format(self.name))
         else:
             Material.__register[self.name] = self
+    def __str__(self):
+        return self.name
         
         
 
